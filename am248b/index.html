@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>百昱企業 ERDEN - AM248B 微氣泡水耕與養殖實績動態簡報</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #080c14;
+            --sidebar-bg: rgba(13, 20, 35, 0.85);
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --primary: #00f3ff;
+            --primary-glow: rgba(0, 243, 255, 0.3);
+            --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.2);
+            --font-stack: 'Outfit', 'Inter', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+            --sidebar-width: 320px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 243, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.04) 0%, transparent 40%);
+        }
+
+        /* Sidebar Design */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+            position: relative;
+        }
+
+        .sidebar.collapsed {
+            margin-left: calc(-1 * var(--sidebar-width));
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #ffffff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .slide-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        /* Custom Scrollbar for list */
+        .slide-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        .slide-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .slide-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .slide-list::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        .slide-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .slide-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(0, 243, 255, 0.2);
+            transform: translateX(3px);
+        }
+
+        .slide-item.active {
+            background: rgba(0, 243, 255, 0.08);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.15);
+        }
+
+        .slide-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: rgba(0, 243, 255, 0.1);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .slide-item.active .slide-num {
+            background: var(--primary);
+            color: #080c14;
+            box-shadow: 0 0 8px var(--primary);
+        }
+
+        .slide-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            overflow: hidden;
+        }
+
+        .slide-info-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #f3f4f6;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .slide-info-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .download-section {
+            padding: 1.2rem;
+            border-top: 1px solid var(--border-color);
+            background: rgba(8, 12, 20, 0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.7rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+        }
+
+        .btn-accent {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        .btn-accent:hover {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+        }
+
+        /* Main Panel Design */
+        .main-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 70px;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(8, 12, 20, 0.7);
+            backdrop-filter: blur(10px);
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .toggle-sidebar-btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            cursor: pointer;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .toggle-sidebar-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--primary);
+        }
+
+        .current-slide-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .slide-counter {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Content Presentation Frame Container */
+        .presentation-container {
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(5, 8, 15, 0.95);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Exact 16:9 Presentation Scaler Box */
+        .slide-frame-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1280px;
+            aspect-ratio: 16 / 9;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: #000;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-frame {
+            position: absolute;
+            width: 1280px;
+            height: 720px;
+            border: none;
+            transform-origin: top left;
+            top: 0;
+            left: 0;
+        }
+
+        /* Loading Overlay */
+        .frame-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #080c14;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .frame-loader.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 243, 255, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer Controls */
+        .controls-bar {
+            height: 80px;
+            background: rgba(8, 12, 20, 0.85);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border-color);
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .controls-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .controls-center {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .controls-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .control-btn:disabled {
+            background: transparent;
+            border-color: rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Autoplay Pill Controls */
+        .autoplay-control {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 0.2rem;
+            border-radius: 30px;
+            gap: 0.2rem;
+        }
+
+        .autoplay-btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.3s;
+        }
+
+        .autoplay-btn.active {
+            background: var(--accent);
+            color: #080c14;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .autoplay-speed {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.4rem 0.6rem;
+            padding-right: 1.2rem;
+            cursor: pointer;
+            outline: none;
+            font-family: inherit;
+        }
+
+        /* Fullscreen Pill Button */
+        .fullscreen-btn {
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.3s;
+        }
+
+        .fullscreen-btn:hover {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Global Progress Bar */
+        .progress-bar-container {
+            position: absolute;
+            bottom: 80px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 20;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 6px var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                inset: 0 auto 0 0;
+                z-index: 100;
+                height: 100vh;
+                margin-left: 0;
+                transform: translateX(0);
+            }
+
+            .sidebar.collapsed {
+                margin-left: 0;
+                transform: translateX(-100%);
+            }
+
+            .main-panel {
+                width: 100%;
+                min-width: 0;
+            }
+        }
+
+        /* Fullscreen Overlay Style Override */
+        :-webkit-full-screen .presentation-container {
+            padding: 0;
+            background: #000;
+        }
+        :-webkit-full-screen .slide-frame-wrapper {
+            max-width: 100%;
+            width: 100vw;
+            height: 56.25vw;
+            border-radius: 0;
+            border: none;
+        }
+
+        :-moz-full-screen .presentation-container {
+            padding: 0;
+            background: #000;
+        }
+        :-moz-full-screen .slide-frame-wrapper {
+            max-width: 100%;
+            width: 100vw;
+            height: 56.25vw;
+            border-radius: 0;
+            border: none;
+        }
+
+        :fullscreen .presentation-container {
+            padding: 0;
+            background: #000;
+        }
+        :fullscreen .slide-frame-wrapper {
+            max-width: 100%;
+            width: 100vw;
+            height: 56.25vw;
+            border-radius: 0;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Dashboard -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <p>百昱企業 ERDEN</p>
+            <h1>微氣泡增養實績簡報</h1>
+        </div>
+
+        <div class="slide-list" id="slideList">
+            <!-- Dynamically populated by JS -->
+        </div>
+
+        <div class="download-section">
+            <a href="downloads/am248b-microbubble-presentation.pptx" download class="btn btn-accent">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                下載簡報 PowerPoint 檔
+            </a>
+            <a href="downloads/am248b-microbubble-presentation.pdf" download class="btn">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                下載簡報 PDF 說明檔
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content Panel -->
+    <div class="main-panel">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <button class="toggle-sidebar-btn" id="toggleSidebar" title="顯示/隱藏側欄">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                <div class="current-slide-title" id="currentSlideTitle">簡報加載中...</div>
+            </div>
+            <div class="top-bar-right">
+                <div class="slide-counter" id="slideCounter">0 / 0</div>
+            </div>
+        </div>
+
+        <!-- Master Presentation Container -->
+        <div class="presentation-container" id="presentationContainer">
+            <div class="slide-frame-wrapper" id="slideFrameWrapper">
+                <iframe src="" class="slide-frame" id="slideFrame"></iframe>
+                <!-- Loading Screen -->
+                <div class="frame-loader" id="frameLoader">
+                    <div class="spinner"></div>
+                    <div style="font-size: 0.9rem; color: var(--text-muted);">正在載入投影片內容...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Progress Bar -->
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+        </div>
+
+        <!-- Bottom Controls Bar -->
+        <div class="controls-bar">
+            <div class="controls-left">
+                <button class="fullscreen-btn" id="fullscreenBtn" title="全螢幕投影 (熱鍵: F)">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4"></path></svg>
+                    全螢幕
+                </button>
+            </div>
+
+            <div class="controls-center">
+                <button class="control-btn" id="prevBtn" title="上一張投影片 (熱鍵: ←)">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <button class="control-btn" id="nextBtn" title="下一張投影片 (熱鍵: → 或 空白鍵)">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+
+            <div class="controls-right">
+                <div class="autoplay-control">
+                    <button class="autoplay-btn" id="autoplayBtn" title="自動撥放投影片">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" class="play-icon"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        自動播放
+                    </button>
+                    <select class="autoplay-speed" id="autoplaySpeed" title="切換間隔時間">
+                        <option value="3000">3 秒</option>
+                        <option value="5000" selected>5 秒</option>
+                        <option value="10000">10 秒</option>
+                        <option value="15000">15 秒</option>
+                        <option value="20000">20 秒</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Presentation Dashboard Logic -->
+    <script>
+        // 1. Definition of the 7 slide items
+        const slides = [
+            {
+                title: "AM248B 水耕農場配置系統",
+                desc: "互動分解圖面 & 提取文字展示",
+                url: "am248b-hydroponics-layout.html",
+                icon: "🔧"
+            },
+            {
+                title: "應用場景一：水耕農場與魚菜共生",
+                desc: "優化根系環境、提升養分吸收率",
+                url: "slide-03-hydroponics-aquaponics.html",
+                icon: "🌱"
+            },
+            {
+                title: "應用場景二：高密度水產養殖",
+                desc: "提高養殖溶氧、抑制厭氧菌滋生",
+                url: "slide-04-recirculating-aquaculture.html",
+                icon: "🐟"
+            },
+            {
+                title: "極速增氧實測軌跡",
+                desc: "開機 5 分鐘溶氧飆升至 7.0 mg/L",
+                url: "slide-05-oxygenation-test.html",
+                icon: "📈"
+            },
+            {
+                title: "微氣泡水體變化與超高氧停留實測",
+                desc: "高密度白霧微細氣泡，深度飽和溶氧",
+                url: "slide-09-microbubble-water-test.html",
+                icon: "🧪"
+            },
+            {
+                title: "三桶水溶氧量對照實測",
+                desc: "比較一般水體、白霧氣泡與深度飽和溶氧",
+                url: "slide-10-dissolved-oxygen-comparison.html",
+                icon: "📊"
+            },
+            {
+                title: "核心增氧設備比對",
+                desc: "AM248B 銅製噴嘴對比 MB248S 黑色噴嘴",
+                url: "slide-15-equipment-comparison.html",
+                icon: "⚙️"
+            }
+        ];
+
+        let currentIndex = 0;
+        let autoplayTimer = null;
+        let isAutoplayActive = false;
+
+        // DOM elements cache
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebarBtn = document.getElementById('toggleSidebar');
+        const slideListContainer = document.getElementById('slideList');
+        const currentSlideTitle = document.getElementById('currentSlideTitle');
+        const slideCounter = document.getElementById('slideCounter');
+        const slideFrame = document.getElementById('slideFrame');
+        const slideFrameWrapper = document.getElementById('slideFrameWrapper');
+        const frameLoader = document.getElementById('frameLoader');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const autoplayBtn = document.getElementById('autoplayBtn');
+        const autoplaySpeedSelect = document.getElementById('autoplaySpeed');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const presentationContainer = document.getElementById('presentationContainer');
+
+        // 2. Initialize sidebar navigation items
+        function initSidebar() {
+            slideListContainer.innerHTML = '';
+            slides.forEach((slide, index) => {
+                const item = document.createElement('div');
+                item.className = `slide-item ${index === currentIndex ? 'active' : ''}`;
+                item.onclick = () => {
+                    selectSlide(index);
+                    if (window.matchMedia('(max-width: 768px)').matches) {
+                        sidebar.classList.add('collapsed');
+                    }
+                };
+                item.innerHTML = `
+                    <div class="slide-num">${index + 1}</div>
+                    <div class="slide-info">
+                        <div class="slide-info-title">${slide.title}</div>
+                        <div class="slide-info-desc">${slide.icon} ${slide.desc}</div>
+                    </div>
+                `;
+                slideListContainer.appendChild(item);
+            });
+        }
+
+        // 3. Main slide loading function
+        function selectSlide(index) {
+            if (index < 0 || index >= slides.length) return;
+            
+            // Clear autoplay timer to avoid double triggers
+            if (isAutoplayActive) {
+                resetAutoplayTimer();
+            }
+
+            currentIndex = index;
+            const slide = slides[currentIndex];
+
+            // Show loader
+            frameLoader.classList.add('active');
+
+            // Update UI statuses
+            currentSlideTitle.textContent = slide.title;
+            slideCounter.textContent = `${currentIndex + 1} / ${slides.length}`;
+            progressBarFill.style.width = `${((currentIndex + 1) / slides.length) * 100}%`;
+
+            // Handle active class in sidebar items
+            const items = slideListContainer.querySelectorAll('.slide-item');
+            items.forEach((item, idx) => {
+                if (idx === currentIndex) {
+                    item.classList.add('active');
+                    item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            // Set iframe source
+            slideFrame.src = slide.url;
+
+            // Handle button disable state
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === slides.length - 1;
+        }
+
+        // 4. Responsive iframe scaling logic
+        // This ensures the iframe scales identically like a vector presentation inside a 16:9 box
+        function scaleIframe() {
+            const wrapperWidth = slideFrameWrapper.clientWidth;
+            const wrapperHeight = slideFrameWrapper.clientHeight;
+            // Native design size is 1280 x 720
+            const scale = Math.min(wrapperWidth / 1280, wrapperHeight / 720);
+            slideFrame.style.transform = `scale(${scale})`;
+        }
+
+        window.addEventListener('resize', scaleIframe);
+        slideFrame.addEventListener('load', () => {
+            // Hide loading overlay
+            frameLoader.classList.remove('active');
+            scaleIframe();
+
+            // Set autofocus inside iframe for keyboard events in child
+            slideFrame.focus();
+        });
+
+        // 5. Sidebar Toggle
+        toggleSidebarBtn.onclick = () => {
+            sidebar.classList.toggle('collapsed');
+            // Give CSS transition time, then re-calculate scale
+            setTimeout(scaleIframe, 400);
+        };
+
+        // 6. Navigation Functions
+        function navigateNext() {
+            if (currentIndex < slides.length - 1) {
+                selectSlide(currentIndex + 1);
+            } else if (isAutoplayActive) {
+                // If it's autoplay and reaches the end, loop back to the start!
+                selectSlide(0);
+            }
+        }
+
+        function navigatePrev() {
+            if (currentIndex > 0) {
+                selectSlide(currentIndex - 1);
+            }
+        }
+
+        prevBtn.onclick = navigatePrev;
+        nextBtn.onclick = navigateNext;
+
+        // 7. Autoplay Mechanism
+        function toggleAutoplay() {
+            isAutoplayActive = !isAutoplayActive;
+            if (isAutoplayActive) {
+                autoplayBtn.classList.add('active');
+                autoplayBtn.innerHTML = `
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" class="play-icon"><path d="M15.75 5.25v13.5m-7.5-13.5v13.5"></path></svg>
+                    暫停播放
+                `;
+                resetAutoplayTimer();
+            } else {
+                autoplayBtn.classList.remove('active');
+                autoplayBtn.innerHTML = `
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" class="play-icon"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    自動播放
+                `;
+                clearTimeout(autoplayTimer);
+            }
+        }
+
+        function resetAutoplayTimer() {
+            clearTimeout(autoplayTimer);
+            const speed = parseInt(autoplaySpeedSelect.value, 10);
+            autoplayTimer = setTimeout(() => {
+                navigateNext();
+            }, speed);
+        }
+
+        autoplayBtn.onclick = toggleAutoplay;
+        autoplaySpeedSelect.onchange = () => {
+            if (isAutoplayActive) {
+                resetAutoplayTimer();
+            }
+        };
+
+        // 8. Fullscreen API Wrapper
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                presentationContainer.requestFullscreen()
+                    .catch(err => {
+                        console.error(`無法啟動全螢幕模式: ${err.message}`);
+                    });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        fullscreenBtn.onclick = toggleFullscreen;
+
+        // Listen for browser fullscreen exit events to trigger resize
+        document.addEventListener('fullscreenchange', () => {
+            setTimeout(scaleIframe, 100);
+        });
+
+        // 9. Hotkey Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case "ArrowRight":
+                case "PageDown":
+                    navigateNext();
+                    break;
+                case "ArrowLeft":
+                case "PageUp":
+                    navigatePrev();
+                    break;
+                case " ":
+                    e.preventDefault(); // Stop space page-scroll
+                    navigateNext();
+                    break;
+                case "f":
+                case "F":
+                    toggleFullscreen();
+                    break;
+            }
+        });
+
+        // Also proxy keyboard events from iframe child
+        window.addEventListener('message', (e) => {
+            if (e.data === 'keydown-next') {
+                navigateNext();
+            } else if (e.data === 'keydown-prev') {
+                navigatePrev();
+            }
+        });
+
+        // 10. Startup Initialization
+        if (window.matchMedia('(max-width: 768px)').matches) {
+            sidebar.classList.add('collapsed');
+        }
+        initSidebar();
+        selectSlide(0);
+        setTimeout(scaleIframe, 300);
+    </script>
+</body>
+</html>

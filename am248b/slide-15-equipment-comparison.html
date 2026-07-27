@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>適配各類農漁基礎設施 - 互動式動態簡報</title>
+    <meta name="description" content="互動式簡報：展示微氣泡技術於水耕農場及養殖漁業之多元設備配置，AM248B系統與MB248S系統之詳細解析。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark-start: #030a16;
+            --bg-dark-end: #0c1c33;
+            --primary-cyan: #00f0ff;
+            --primary-green: #10b981;
+            --primary-blue: #3b82f6;
+            --text-light: #ffffff;
+            --text-muted: #94a3b8;
+            --border-radius-lg: 24px;
+            --border-radius-md: 16px;
+            --border-radius-sm: 8px;
+            --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --transition-speed: 0.4s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark-start) 0%, var(--bg-dark-end) 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Dynamic Bubble Background */
+        .bubble-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 70%, rgba(0, 240, 255, 0.1) 100%);
+            border-radius: 50%;
+            bottom: -20px;
+            animation: rise linear infinite;
+        }
+
+        @keyframes rise {
+            0% {
+                transform: translateY(0) scale(1) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% {
+                transform: translateY(-105vh) scale(1.2) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Top Header */
+        header {
+            padding: 16px 30px;
+            background: rgba(3, 10, 22, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .logo-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, var(--primary-cyan) 0%, var(--primary-blue) 100%);
+            width: 8px;
+            height: 28px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Nav Menu Controls */
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+        }
+
+        .menu-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .menu-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            border: none;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 198, 255, 0.3);
+        }
+
+        /* Main Workspace */
+        main {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 30px;
+            z-index: 1;
+        }
+
+        /* Slides Container */
+        .slides-container {
+            width: 100%;
+            max-width: 1100px;
+            height: 600px;
+            position: relative;
+            background: rgba(13, 27, 49, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+        }
+
+        @media (max-width: 950px) {
+            .slides-container {
+                height: auto;
+                min-height: 550px;
+            }
+        }
+
+        /* Individual Slide */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 36px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-speed) ease-in-out, transform var(--transition-speed) ease-in-out;
+            transform: scale(0.97);
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+            z-index: 2;
+        }
+
+        /* Slide Header Area */
+        .slide-header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1.5px dashed rgba(255, 255, 255, 0.1);
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+        }
+
+        .slide-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .slide-subtitle {
+            font-size: 0.95rem;
+            color: var(--primary-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Slide Body */
+        .slide-body {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Slide Footer */
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1.5px dashed rgba(255, 255, 255, 0.1);
+            padding-top: 14px;
+            margin-top: 16px;
+        }
+
+        .dots-navigation {
+            display: flex;
+            gap: 10px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .dot.active {
+            background: var(--primary-cyan);
+            box-shadow: 0 0 10px var(--primary-cyan);
+            width: 24px;
+            border-radius: 5px;
+        }
+
+        .arrow-navigation-btns {
+            display: flex;
+            gap: 12px;
+        }
+
+        .arrow-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .arrow-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: var(--primary-cyan);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* ---------------------------------------------------- */
+        /* SLIDE 0: OVERVIEW LAYOUT */
+        /* ---------------------------------------------------- */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            width: 100%;
+        }
+
+        .overview-card {
+            background: rgba(16, 32, 59, 0.45);
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .overview-card:hover {
+            border-color: var(--primary-cyan);
+            background: rgba(16, 32, 59, 0.7);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .overview-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-cyan);
+            border-radius: 12px 0 0 12px;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        .overview-card:hover::before {
+            opacity: 1;
+            box-shadow: 0 0 10px var(--primary-cyan);
+        }
+
+        .overview-img-container {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 2px dashed rgba(0, 240, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            background: #0b1a32;
+        }
+
+        .overview-img {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .overview-info {
+            flex-grow: 1;
+        }
+
+        .overview-badge {
+            background: rgba(0, 240, 255, 0.12);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            color: var(--primary-cyan);
+            padding: 2px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 4px;
+            width: fit-content;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .overview-card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #ffffff;
+            font-family: 'Outfit', 'Noto Sans TC', sans-serif;
+        }
+
+        .overview-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .click-guide {
+            position: absolute;
+            bottom: 12px;
+            right: 16px;
+            font-size: 0.75rem;
+            color: var(--primary-cyan);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .overview-card:hover .click-guide {
+            opacity: 1;
+        }
+
+        /* ---------------------------------------------------- */
+        /* SLIDES 1 & 2: DETAILED VIEWS WITH INTERACTIVE MARKERS */
+        /* ---------------------------------------------------- */
+        .detail-layout {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 40px;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+        }
+
+        .interactive-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(11, 26, 49, 0.5);
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-md);
+            padding: 30px;
+            height: 380px;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .detail-device-img {
+            max-height: 280px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 25px rgba(0, 240, 255, 0.25));
+        }
+
+        .detail-label-tag {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid var(--primary-cyan);
+            color: var(--primary-cyan);
+            padding: 4px 14px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* Hotspot markers */
+        .hotspot-marker {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .hotspot-ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--primary-cyan);
+            opacity: 0.8;
+            box-shadow: 0 0 10px var(--primary-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .hotspot-marker:hover .hotspot-ring {
+            transform: scale(1.3);
+            opacity: 1;
+            box-shadow: 0 0 15px var(--primary-cyan);
+        }
+
+        .hotspot-pulse {
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1.5px solid var(--primary-cyan);
+            opacity: 0;
+            animation: pulseGlow 2s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(0.6); opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+
+        .hotspot-num {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 900;
+            color: #030a16;
+            z-index: 2;
+        }
+
+        /* Hotspot popup info card */
+        .hotspot-info-card {
+            background: rgba(13, 27, 49, 0.95);
+            border: 1.5px solid var(--primary-cyan);
+            border-radius: var(--border-radius-md);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: 380px;
+            justify-content: center;
+            box-shadow: var(--shadow-glow);
+            position: relative;
+        }
+
+        /* sci-fi accents on info card */
+        .hotspot-info-card::before {
+            content: '';
+            position: absolute;
+            top: -1.5px;
+            left: -1.5px;
+            width: 12px;
+            height: 12px;
+            border-top: 3px solid var(--primary-cyan);
+            border-left: 3px solid var(--primary-cyan);
+        }
+
+        .hotspot-info-card::after {
+            content: '';
+            position: absolute;
+            bottom: -1.5px;
+            right: -1.5px;
+            width: 12px;
+            height: 12px;
+            border-bottom: 3px solid var(--primary-cyan);
+            border-right: 3px solid var(--primary-cyan);
+        }
+
+        .info-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 12px;
+        }
+
+        .info-card-badge {
+            background: var(--primary-cyan);
+            color: #030a16;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 900;
+            font-size: 0.85rem;
+        }
+
+        .info-card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .info-card-body {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        .info-card-default-tip {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        /* ---------------------------------------------------- */
+        /* SLIDE 3: COMPARISON MATRIX TABLE */
+        /* ---------------------------------------------------- */
+        .comparison-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            background: rgba(13, 27, 49, 0.4);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .comp-table th, .comp-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .comp-table th {
+            background: rgba(16, 32, 59, 0.8);
+            font-weight: 700;
+            color: var(--primary-cyan);
+            font-size: 0.92rem;
+            letter-spacing: 0.5px;
+        }
+
+        .comp-table tr:hover {
+            background: rgba(0, 240, 255, 0.03);
+        }
+
+        .comp-table td b {
+            color: #ffffff;
+        }
+
+        .col-highlight {
+            color: var(--primary-cyan);
+            font-weight: 700;
+        }
+
+        .comp-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .comp-tag.cyan {
+            background: rgba(0, 240, 255, 0.12);
+            color: var(--primary-cyan);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+        }
+
+        .comp-tag.blue {
+            background: rgba(59, 130, 246, 0.12);
+            color: var(--primary-blue);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .summary-badge-callout {
+            background: rgba(0, 240, 255, 0.06);
+            border-left: 4px solid var(--primary-cyan);
+            padding: 10px 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #e2e8f0;
+        }
+
+        .summary-badge-callout b {
+            color: var(--primary-cyan);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Rising Bubbles Decor -->
+    <div class="bubble-container" id="bubble-container"></div>
+
+    <!-- Header bar -->
+    <header>
+        <div class="logo-title">
+            <div class="logo-badge"></div>
+            <span class="logo-text">ERDEN 微氣泡增氧實績</span>
+        </div>
+        <nav class="nav-menu">
+            <button class="menu-btn active" onclick="goToSlide(0)">配置概覽</button>
+            <button class="menu-btn" onclick="goToSlide(1)">AM248B 核心動力</button>
+            <button class="menu-btn" onclick="goToSlide(2)">MB248S 末端防護</button>
+            <button class="menu-btn" onclick="goToSlide(3)">選型指南</button>
+        </nav>
+    </header>
+
+    <!-- Main Slides Area -->
+    <main>
+        <div class="slides-container">
+
+            <!-- SLIDE 0: OVERVIEW -->
+            <article class="slide active" id="slide-0">
+                <div class="slide-header-area">
+                    <h2 class="slide-title">靈活配置，適配各類農漁基礎設施</h2>
+                    <span class="slide-subtitle">01 / Configurations Overview</span>
+                </div>
+
+                <div class="slide-body">
+                    <div class="overview-grid">
+                        <!-- AM248B Card -->
+                        <div class="overview-card" onclick="goToSlide(1); triggerUIFeedback('click');">
+                            <div class="overview-img-container">
+                                <img class="overview-img" src="./images/slides/page15-am248b-nozzle.jpg" alt="AM248B">
+                            </div>
+                            <div class="overview-info">
+                                <div class="overview-badge">核心動力樞紐</div>
+                                <h3 class="overview-card-title">AM248B 系統</h3>
+                                <p class="overview-desc">承受高壓，適用於大型集中式水處理、前置過濾淨水區，提供極致換水增氧率。</p>
+                            </div>
+                            <div class="click-guide">查看詳細結構 &gt;</div>
+                        </div>
+
+                        <!-- MB248S Card -->
+                        <div class="overview-card" onclick="goToSlide(2); triggerUIFeedback('click');">
+                            <div class="overview-img-container">
+                                <img class="overview-img" src="./images/slides/page15-mb248s-nozzle.jpg" alt="MB248S">
+                            </div>
+                            <div class="overview-info">
+                                <div class="overview-badge" style="background: rgba(16, 185, 129, 0.12); color: var(--primary-green); border-color: rgba(16, 185, 129, 0.3);">末端防護配置</div>
+                                <h3 class="overview-card-title">MB248S 系統</h3>
+                                <p class="overview-desc">直接安裝於末端植生槽、有機魚菜共生桶、或養殖池內。內建網防堵塞，即時補償。</p>
+                            </div>
+                            <div class="click-guide" style="color: var(--primary-green);">查看詳細結構 &gt;</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer">
+                    <div class="dots-navigation">
+                        <span class="dot active" onclick="goToSlide(0)"></span>
+                        <span class="dot" onclick="goToSlide(1)"></span>
+                        <span class="dot" onclick="goToSlide(2)"></span>
+                        <span class="dot" onclick="goToSlide(3)"></span>
+                    </div>
+                    <div class="arrow-navigation-btns">
+                        <button class="arrow-btn" onclick="prevSlide(); triggerUIFeedback('click');">←</button>
+                        <button class="arrow-btn" onclick="nextSlide(); triggerUIFeedback('click');">→</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SLIDE 1: AM248B DETAILED VIEW -->
+            <article class="slide" id="slide-1">
+                <div class="slide-header-area">
+                    <h2 class="slide-title">AM248B 系統：核心動力樞紐</h2>
+                    <span class="slide-subtitle">02 / AM248B Heavy-duty System</span>
+                </div>
+
+                <div class="slide-body">
+                    <div class="detail-layout">
+                        <!-- Left Interactive Image -->
+                        <div class="interactive-visual">
+                            <span class="detail-label-tag">互動定位模式 (請點選標記)</span>
+                            <img class="detail-device-img" src="./images/slides/page15-am248b-nozzle.jpg" alt="AM248B 系統">
+                            
+                            <!-- Hotspot 1: Inlet -->
+                            <div class="hotspot-marker" style="top: 15%; left: 52%;" onclick="showHotspot(1, 1)">
+                                <div class="hotspot-ring"></div>
+                                <div class="hotspot-pulse"></div>
+                                <span class="hotspot-num">1</span>
+                            </div>
+
+                            <!-- Hotspot 2: Body -->
+                            <div class="hotspot-marker" style="top: 50%; left: 45%;" onclick="showHotspot(1, 2)">
+                                <div class="hotspot-ring"></div>
+                                <div class="hotspot-pulse"></div>
+                                <span class="hotspot-num">2</span>
+                            </div>
+                        </div>
+
+                        <!-- Right Detail Pane -->
+                        <div class="hotspot-info-card" id="info-pane-1">
+                            <div class="info-card-default-tip" id="default-tip-1">
+                                <p>💡 <b>操作提示</b></p>
+                                <p>請點擊左側銅噴嘴圖像上的 <b>1</b> 或 <b>2</b> 號呼吸式標籤，即可動態展開該核心部位的運作機制與技術規格說明。</p>
+                            </div>
+                            <div class="info-card-content" id="info-content-1" style="display: none;">
+                                <div class="info-card-header">
+                                    <span class="info-card-badge" id="info-num-1">1</span>
+                                    <h3 class="info-card-title" id="info-title-1">部位名稱</h3>
+                                </div>
+                                <div class="info-card-body" id="info-body-1">
+                                    部位說明內容...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer">
+                    <div class="dots-navigation">
+                        <span class="dot" onclick="goToSlide(0)"></span>
+                        <span class="dot active" onclick="goToSlide(1)"></span>
+                        <span class="dot" onclick="goToSlide(2)"></span>
+                        <span class="dot" onclick="goToSlide(3)"></span>
+                    </div>
+                    <div class="arrow-navigation-btns">
+                        <button class="arrow-btn" onclick="prevSlide(); triggerUIFeedback('click');">←</button>
+                        <button class="arrow-btn" onclick="nextSlide(); triggerUIFeedback('click');">→</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SLIDE 2: MB248S DETAILED VIEW -->
+            <article class="slide" id="slide-2">
+                <div class="slide-header-area">
+                    <h2 class="slide-title">MB248S 系統：末端防護配置</h2>
+                    <span class="slide-subtitle">03 / MB248S Anti-clogging System</span>
+                </div>
+
+                <div class="slide-body">
+                    <div class="detail-layout">
+                        <!-- Left Interactive Image -->
+                        <div class="interactive-visual" style="background: rgba(11, 49, 41, 0.15); border-color: rgba(16, 185, 129, 0.2);">
+                            <span class="detail-label-tag" style="border-color: var(--primary-green); color: var(--primary-green); background: rgba(16, 185, 129, 0.1);">互動定位模式 (請點選標記)</span>
+                            <img class="detail-device-img" src="./images/slides/page15-mb248s-nozzle.jpg" alt="MB248S 系統">
+                            
+                            <!-- Hotspot 1: Front Mesh -->
+                            <div class="hotspot-marker" style="top: 55%; left: 30%;" onclick="showHotspot(2, 1)">
+                                <div class="hotspot-ring" style="background: var(--primary-green); box-shadow: 0 0 10px var(--primary-green);"></div>
+                                <div class="hotspot-pulse" style="border-color: var(--primary-green);"></div>
+                                <span class="hotspot-num">1</span>
+                            </div>
+
+                            <!-- Hotspot 2: Top Inlet -->
+                            <div class="hotspot-marker" style="top: 25%; left: 55%;" onclick="showHotspot(2, 2)">
+                                <div class="hotspot-ring" style="background: var(--primary-green); box-shadow: 0 0 10px var(--primary-green);"></div>
+                                <div class="hotspot-pulse" style="border-color: var(--primary-green);"></div>
+                                <span class="hotspot-num">2</span>
+                            </div>
+
+                            <!-- Hotspot 3: Bottom Base -->
+                            <div class="hotspot-marker" style="top: 85%; left: 60%;" onclick="showHotspot(2, 3)">
+                                <div class="hotspot-ring" style="background: var(--primary-green); box-shadow: 0 0 10px var(--primary-green);"></div>
+                                <div class="hotspot-pulse" style="border-color: var(--primary-green);"></div>
+                                <span class="hotspot-num">3</span>
+                            </div>
+                        </div>
+
+                        <!-- Right Detail Pane -->
+                        <div class="hotspot-info-card" id="info-pane-2" style="border-color: var(--primary-green); box-shadow: 0 0 25px rgba(16, 185, 129, 0.08);">
+                            <!-- sci-fi accents override -->
+                            <style>
+                                #info-pane-2::before { border-top-color: var(--primary-green); border-left-color: var(--primary-green); }
+                                #info-pane-2::after { border-bottom-color: var(--primary-green); border-right-color: var(--primary-green); }
+                            </style>
+                            <div class="info-card-default-tip" id="default-tip-2">
+                                <p>💡 <b>操作提示</b></p>
+                                <p>請點擊左側黑色防堵噴嘴圖像上的 <b>1</b>、<b>2</b> 或 <b>3</b> 號標籤，即可動態展開該末端裝置在有機水質中的自清潔與穩固安置解析。</p>
+                            </div>
+                            <div class="info-card-content" id="info-content-2" style="display: none;">
+                                <div class="info-card-header">
+                                    <span class="info-card-badge" id="info-num-2" style="background: var(--primary-green);">1</span>
+                                    <h3 class="info-card-title" id="info-title-2">部位名稱</h3>
+                                </div>
+                                <div class="info-card-body" id="info-body-2">
+                                    部位說明內容...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer">
+                    <div class="dots-navigation">
+                        <span class="dot" onclick="goToSlide(0)"></span>
+                        <span class="dot" onclick="goToSlide(1)"></span>
+                        <span class="dot active" onclick="goToSlide(2)"></span>
+                        <span class="dot" onclick="goToSlide(3)"></span>
+                    </div>
+                    <div class="arrow-navigation-btns">
+                        <button class="arrow-btn" onclick="prevSlide(); triggerUIFeedback('click');">←</button>
+                        <button class="arrow-btn" onclick="nextSlide(); triggerUIFeedback('click');">→</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SLIDE 3: COMPARISON MATRIX -->
+            <article class="slide" id="slide-3">
+                <div class="slide-header-area">
+                    <h2 class="slide-title">選型指南與配置對比矩陣</h2>
+                    <span class="slide-subtitle">04 / System Comparison Matrix</span>
+                </div>
+
+                <div class="slide-body">
+                    <div class="comparison-container">
+                        <table class="comp-table">
+                            <thead>
+                                <tr>
+                                    <th>對比指標</th>
+                                    <th>AM248B 系統 (核心動力樞紐)</th>
+                                    <th>MB248S 系統 (末端防護配置)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><b>主要定位</b></td>
+                                    <td><span class="comp-tag cyan">高容量集中處理</span></td>
+                                    <td><span class="comp-tag blue">末端分散點狀防護</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>最佳安裝位置</b></td>
+                                    <td>大型集中式水處理槽、前置過濾淨水區</td>
+                                    <td>末端植生槽、含有機質的魚菜共生桶、養殖池底</td>
+                                </tr>
+                                <tr>
+                                    <td><b>水體處理規模</b></td>
+                                    <td><b>數十噸級以上</b> (大流量循環)</td>
+                                    <td><b>單體/小組分區</b> (小至中流量精細噴射)</td>
+                                </tr>
+                                <tr>
+                                    <td><b>雜質耐受度</b></td>
+                                    <td>中等 (建議搭配前置過濾)</td>
+                                    <td><b>極高</b> (內建金屬防堵濾網，無懼懸浮物)</td>
+                                </tr>
+                                <tr>
+                                    <td><b>核心物理優勢</b></td>
+                                    <td>承受高溫與高壓，極致的換水增氧速率</td>
+                                    <td>提供局部即時的微氣泡噴射與剪切補償</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="summary-badge-callout">
+                            📌 <b>配置心法：</b>對於<b>大體積</b>水源，應於機房或前置過濾槽配置 <b>AM248B</b> 作為主力溶氧引擎；而在<b>種植床末端或高有機物養殖池內</b>，配置 <b>MB248S</b> 進行多點微量氣泡的即時補償與雜質防護，兩者協同效果最佳。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer">
+                    <div class="dots-navigation">
+                        <span class="dot" onclick="goToSlide(0)"></span>
+                        <span class="dot" onclick="goToSlide(1)"></span>
+                        <span class="dot" onclick="goToSlide(2)"></span>
+                        <span class="dot active" onclick="goToSlide(3)"></span>
+                    </div>
+                    <div class="arrow-navigation-btns">
+                        <button class="arrow-btn" onclick="prevSlide(); triggerUIFeedback('click');">←</button>
+                        <button class="arrow-btn" onclick="nextSlide(); triggerUIFeedback('click');">→</button>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+        const menuBtns = document.querySelectorAll('.menu-btn');
+
+        // Dynamic hotspot data
+        const hotspotsData = {
+            1: { // AM248B
+                1: {
+                    title: "高壓呼吸進氣接頭",
+                    body: "此為 AM248B 系統的氣體導入核心。當高壓水流在內部流動產生局部真空時，本接頭會利用物理虹吸效應自動吸入空氣、純氧或臭氧。<b>不需額外加壓氣泵</b>，高效率將氣體吸入混合腔中進行激烈的剪切碎化。"
+                },
+                2: {
+                    title: "銅製高壓文氏管本體",
+                    body: "本體採用<b>精密黃銅鍛造工藝</b>，可承受高水壓運轉。內部流道採用精密縮徑收縮設計，利用流體力學文氏管效應（Venturi Effect），在高壓推動下令水流流速瞬間倍增，產生強力氣液混合與微氣泡切割，為數十噸級水體提供極致的溶氧效率。"
+                }
+            },
+            2: { // MB248S
+                1: {
+                    title: "不鏽鋼防堵過濾網",
+                    body: "MB248S 末端裝置專為<b>含有機質、懸浮雜質高</b>的水體（如魚菜共生桶、藻類繁盛的養殖池）設計。此前端不鏽鋼金屬網能夠在吸入混合水流時阻擋纖維、大顆粒雜質與藻類，<b>防堵塞性能卓越</b>，降低維護頻率。"
+                },
+                2: {
+                    title: "旋流微細氣泡噴射孔",
+                    body: "此處為噴砂噴嘴的出水結構。經防堵濾網過濾後的水流在此處進行旋流混合，並以特定的剪切角度高速噴射而出，在末端即時生成均勻、細密的乳白色霧狀微氣泡，<b>直接補償根系或魚蝦生存區的溶解氧</b>。"
+                },
+                3: {
+                    title: "防震彈性吸盤底座",
+                    body: "底座配置強力彈性橡膠吸盤，不需複雜的管道螺絲固定，即可<b>快速吸附於各類水桶、玻璃纖維槽壁、或水泥池底</b>。具有出色的防震減噪效果，且極易拆卸清潔，位置調整十分靈活。"
+                }
+            }
+        };
+
+        function goToSlide(index) {
+            if (index < 0 || index >= slides.length) return;
+
+            // Deactivate current slide/button/dot
+            slides[currentSlide].classList.remove('active');
+            dots[currentSlide].classList.remove('active');
+            menuBtns[currentSlide].classList.remove('active');
+
+            // Activate new slide/button/dot
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+            menuBtns[currentSlide].classList.add('active');
+
+            // Reset hotspot views
+            resetHotspots();
+        }
+
+        function nextSlide() {
+            const nextIdx = (currentSlide + 1) % slides.length;
+            goToSlide(nextIdx);
+        }
+
+        function prevSlide() {
+            const prevIdx = (currentSlide - 1 + slides.length) % slides.length;
+            goToSlide(prevIdx);
+        }
+
+        function resetHotspots() {
+            // Reset AM248B Hotspot Content
+            document.getElementById('default-tip-1').style.display = 'block';
+            document.getElementById('info-content-1').style.display = 'none';
+            
+            // Reset MB248S Hotspot Content
+            document.getElementById('default-tip-2').style.display = 'block';
+            document.getElementById('info-content-2').style.display = 'none';
+        }
+
+        function showHotspot(deviceNum, hotspotId) {
+            // Trigger visual button/click sound
+            triggerUIFeedback('hotspot');
+
+            const data = hotspotsData[deviceNum][hotspotId];
+            if (!data) return;
+
+            const defaultTip = document.getElementById(`default-tip-${deviceNum}`);
+            const contentBox = document.getElementById(`info-content-${deviceNum}`);
+            const numBadge = document.getElementById(`info-num-${deviceNum}`);
+            const titleEl = document.getElementById(`info-title-${deviceNum}`);
+            const bodyEl = document.getElementById(`info-body-${deviceNum}`);
+
+            // Hide default tip
+            defaultTip.style.display = 'none';
+
+            // Set content
+            numBadge.textContent = hotspotId;
+            titleEl.innerHTML = data.title;
+            bodyEl.innerHTML = data.body;
+
+            // Animate box in
+            contentBox.style.display = 'block';
+            contentBox.style.animation = 'none';
+            contentBox.offsetHeight; // trigger reflow
+            contentBox.style.animation = 'fadeInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+        }
+
+        // Web Audio Synth for tech UI feedback sounds
+        let audioCtx = null;
+        function triggerUIFeedback(type) {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                if (type === 'click') {
+                    // Click sound: short clean synth pip
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1800, audioCtx.currentTime + 0.05);
+                    gainNode.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.08);
+                } else if (type === 'hotspot') {
+                    // Hotspot click sound: glowing tech laser beep
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(1400, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.12);
+                    gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                }
+            } catch(e) {
+                // Audio context block or not supported
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                nextSlide();
+                triggerUIFeedback('click');
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+                triggerUIFeedback('click');
+            }
+        });
+
+        // Generate rising bubbles decoration
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('bubble-container');
+            const numBubbles = 30;
+            
+            for (let i = 0; i < numBubbles; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                
+                const size = Math.random() * 8 + 4; // 4px to 12px
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${Math.random() * 100}%`;
+                bubble.style.animationDuration = `${Math.random() * 7 + 5}s`; // 5s to 12s
+                bubble.style.animationDelay = `${Math.random() * 8}s`;
+                bubble.style.opacity = Math.random() * 0.35 + 0.1;
+                
+                container.appendChild(bubble);
+            }
+        });
+    </script>
+
+    <!-- Hotspot animations -->
+    <style>
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(12px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+<script>
+document.addEventListener('keydown', (e) => {
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") {
+        window.parent.postMessage('keydown-next', '*');
+    } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        window.parent.postMessage('keydown-prev', '*');
+    }
+});
+</script>
+</body>
+</html>

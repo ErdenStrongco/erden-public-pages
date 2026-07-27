@@ -1,0 +1,34 @@
+AM248B 水耕配置 圖片文字分解對照表
+
+【頂部區域】
+1. LED 生長燈 (LED Grow Lights)
+2. 多層式 NFT 種植架 (NFT Growing Racks)
+3. 環境傳感器 (Environmental Sensors: T/H)
+
+【左側文氏管與氣泡示意框】
+4. 文氏管原理示意 (Venturi Principle Concept)
+5. 微奈米氣泡 (Micro-Nanobubbles)
+
+【左側與底部水槽系統】
+6. 馬達 (pump) [上部，營養液儲存槽上方]
+7. 營養液儲存槽 (Nutrient Solution Reservoir, 500L) [含型號 MB248S]
+8. 營養液供水管 (Nutrient Solution Supply Line)
+9. 馬達 (pump) [下部，營養液儲存槽右側]
+
+【中央種植架與回水系統】
+10. 植物 (Plants)
+11. 回水槽 (Return Gutter)
+12. Air In (空氣吸入口)
+13. 過濾器 (Primary Filter)
+14. 多層式 NFT 種植架 (NFT Growing Racks)
+
+【右側養分控制與監測系統】
+15. 養分控制與監測系統 (Nutrient Control & Monitoring System)
+16. 監測器 (Controller) [面板包含: pH 值、EC 值、溫度]
+17. pH 值 (pH 值標籤)
+18. EC 值 (EC 值標籤)
+19. 溫度 (Temperature) (溫度標籤)
+20. 蠕動泵 (Peristaltic Pump)
+21. 養分濃縮液A (Stock A)
+22. 養分濃縮液B (Stock B)
+23. pH 調節劑 (pH Adjuster)

@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AM248B 水耕農場配置系統 - 互動分解圖面</title>
+    <style>
+        :root {
+            --bg-color: #0b111e;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --primary: #00f3ff;
+            --primary-glow: rgba(0, 243, 255, 0.3);
+            --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.2);
+            --font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 243, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
+        }
+
+        header {
+            background: rgba(11, 17, 30, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-title p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-glow);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .btn-accent {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #34d399;
+        }
+
+        .btn-accent:hover {
+            background: var(--accent-glow);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1800px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 1200px) {
+            .workspace-grid {
+                grid-template-columns: 7fr 3fr;
+            }
+        }
+
+        /* 互動圖面區 */
+        .diagram-container-wrapper {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .diagram-container {
+            position: relative;
+            width: 100%;
+            max-width: 2816px;
+            aspect-ratio: 2816 / 1536;
+            background-image: url('images/am248b-hydroponics-layout.jpg');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 覆蓋熱區 */
+        .hotspot-overlay {
+            position: absolute;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+
+        .hotspot-overlay:hover, .hotspot-overlay.active {
+            border-color: var(--primary);
+            background-color: rgba(0, 243, 255, 0.12);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4), inset 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        /* 脈衝指示點 */
+        .pulse-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            pointer-events: none;
+            box-shadow: 0 0 10px var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .pulse-dot::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.3); opacity: 0.8; }
+            80%, 100% { transform: scale(1.8); opacity: 0; }
+        }
+
+        .hotspot-overlay:hover ~ .pulse-dot,
+        .hotspot-overlay.active ~ .pulse-dot {
+            background: var(--accent);
+            box-shadow: 0 0 15px var(--accent);
+        }
+        .hotspot-overlay:hover ~ .pulse-dot::after,
+        .hotspot-overlay.active ~ .pulse-dot::after {
+            border-color: var(--accent);
+        }
+
+        /* 右側詳細資料面板 */
+        .details-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(12px);
+            min-height: 400px;
+        }
+
+        .panel-placeholder {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: var(--text-muted);
+            padding: 3rem 1rem;
+            border: 2px dashed rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .panel-placeholder svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1.5rem;
+            stroke: var(--text-muted);
+            opacity: 0.6;
+        }
+
+        .panel-placeholder h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .panel-content {
+            display: none;
+            flex-direction: column;
+            gap: 1.2rem;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-header {
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0.8rem;
+        }
+
+        .panel-title-zh {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.2rem;
+        }
+
+        .panel-title-en {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .panel-crop-wrapper {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            aspect-ratio: 16 / 9;
+        }
+
+        .panel-crop-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 4px;
+            transition: transform 0.3s ease;
+        }
+
+        .panel-crop-wrapper:hover .panel-crop-img {
+            transform: scale(1.05);
+        }
+
+        .panel-section-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+
+        .text-extracted-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            padding: 0.8rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: #a7f3d0;
+            white-space: pre-line;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            padding: 0.2rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-glow);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .panel-desc {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #d1d5db;
+        }
+
+        /* 分解列表畫廊 */
+        .gallery-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .gallery-section h2 {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--accent);
+            padding-left: 0.8rem;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .gallery-item {
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .gallery-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(0, 243, 255, 0.1);
+        }
+
+        .gallery-img-wrapper {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .gallery-img-wrapper img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .gallery-info h4 {
+            font-size: 1.05rem;
+            color: var(--text-main);
+            margin-bottom: 0.2rem;
+        }
+
+        .gallery-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--card-border);
+            background: rgba(11, 17, 30, 0.9);
+            margin-top: auto;
+        }
+
+        .diagram-footer-tips {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-top: 0.8rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">
+            <h1>AM248B 水耕農場配置系統</h1>
+            <p>互動分解圖面 & 提取文字展示</p>
+        </div>
+        <div class="header-actions">
+            <a href="images/am248b-hydroponics-layout.jpg" target="_blank" class="btn">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                原始大圖
+            </a>
+            <a href="assets/am248b-text-reference.txt" target="_blank" class="btn btn-accent">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                提取文字檔
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <div class="workspace-grid">
+            <!-- 左側互動地圖 -->
+            <div class="diagram-container-wrapper">
+                <div class="diagram-container" id="diagramContainer">
+                    
+                    <!-- 1. LED 生長燈 (Icon & Label) -->
+                    <div class="hotspot-overlay" id="hs-led_icon" style="left: 26.278%; top: 11.719%; width: 14.915%; height: 7.813%;" onclick="selectComponent('led_icon')"></div>
+                    <div class="pulse-dot" style="left: 33.73%; top: 15.625%;"></div>
+
+                    <!-- 2. LED 生長燈條 (Fixture) -->
+                    <div class="hotspot-overlay" id="hs-led_fixture" style="left: 42.969%; top: 10.417%; width: 23.793%; height: 14.323%;" onclick="selectComponent('led_fixture')"></div>
+                    <div class="pulse-dot" style="left: 54.86%; top: 17.58%;"></div>
+
+                    <!-- 3. 環境傳感器 -->
+                    <div class="hotspot-overlay" id="hs-sensor" style="left: 76.349%; top: 10.417%; width: 19.531%; height: 9.115%;" onclick="selectComponent('sensor')"></div>
+                    <div class="pulse-dot" style="left: 86.11%; top: 14.97%;"></div>
+
+                    <!-- 4. 文氏管與氣泡示意框 -->
+                    <div class="hotspot-overlay" id="hs-venturi" style="left: 2.841%; top: 29.948%; width: 22.372%; height: 20.833%;" onclick="selectComponent('venturi')"></div>
+                    <div class="pulse-dot" style="left: 14.03%; top: 40.36%;"></div>
+
+                    <!-- 5. 營養液儲存槽 -->
+                    <div class="hotspot-overlay" id="hs-reservoir" style="left: 13.139%; top: 63.802%; width: 18.821%; height: 27.344%;" onclick="selectComponent('reservoir')"></div>
+                    <div class="pulse-dot" style="left: 22.55%; top: 77.47%;"></div>
+
+                    <!-- 6. 供水馬達 -->
+                    <div class="hotspot-overlay" id="hs-pump_up" style="left: 20.241%; top: 53.385%; width: 6.392%; height: 10.417%;" onclick="selectComponent('pump_up')"></div>
+                    <div class="pulse-dot" style="left: 23.44%; top: 58.59%;"></div>
+
+                    <!-- 7. 循環馬達 -->
+                    <div class="hotspot-overlay" id="hs-pump_down" style="left: 31.960%; top: 79.427%; width: 6.392%; height: 10.417%;" onclick="selectComponent('pump_down')"></div>
+                    <div class="pulse-dot" style="left: 35.16%; top: 84.64%;"></div>
+
+                    <!-- 8. 空氣吸入口與主過濾器 -->
+                    <div class="hotspot-overlay" id="hs-filter" style="left: 39.418%; top: 80.078%; width: 14.205%; height: 18.229%;" onclick="selectComponent('filter')"></div>
+                    <div class="pulse-dot" style="left: 46.52%; top: 89.19%;"></div>
+
+                    <!-- 9. 多層式 NFT 種植架 -->
+                    <div class="hotspot-overlay" id="hs-racks" style="left: 40.128%; top: 28.646%; width: 30.895%; height: 61.198%;" onclick="selectComponent('racks')"></div>
+                    <div class="pulse-dot" style="left: 55.57%; top: 59.24%;"></div>
+
+                    <!-- 10. 養分控制與監測系統 -->
+                    <div class="hotspot-overlay" id="hs-control_box" style="left: 74.574%; top: 26.693%; width: 22.727%; height: 64.453%;" onclick="selectComponent('control_box')"></div>
+                    <div class="pulse-dot" style="left: 85.94%; top: 58.92%;"></div>
+
+                </div>
+                <div class="diagram-footer-tips">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+                    提示：將滑鼠移至圖面元件或點選發光點，可於右側展開詳細分解資訊。
+                </div>
+            </div>
+
+            <!-- 右側詳細資訊面板 -->
+            <div class="details-panel" id="detailsPanel">
+                <div class="panel-placeholder" id="panelPlaceholder">
+                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21m0 0l-.813-5.096L9 21zm0 0h1l-1 1-1-1h1zm7.373-3.431L21 14m0 0l-3.813-3.431M21 14l-1-1 1-1-1 1m-10.702-8.32L5 8m0 0L1.187 4.568M5 8v1M17.324 4.5l-5.656 5.656m-5.657 5.656l-2.12 2.122m13.78-8.484a8.25 8.25 0 11-11.667 0 8.25 8.25 0 0111.668 0z"></path></svg>
+                    <h3>尚未選擇元件</h3>
+                    <p>請點選左方架構圖上的發光指示點，以查看該部分分解出的圖像、文字與功能說明。</p>
+                </div>
+
+                <div class="panel-content" id="panelContent">
+                    <div class="panel-header">
+                        <div class="panel-title-zh" id="panelTitleZh">元件名稱</div>
+                        <div class="panel-title-en" id="panelTitleEn">Component Name</div>
+                    </div>
+                    
+                    <div class="panel-crop-wrapper">
+                        <img src="" alt="Decomposed crop" class="panel-crop-img" id="panelCropImg">
+                    </div>
+
+                    <div>
+                        <div class="panel-section-title">分解提取文字</div>
+                        <div class="text-extracted-box">
+                            <span id="panelExtractedText">提取文字</span>
+                            <button class="copy-btn" onclick="copyExtractedText()">複製文字</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="panel-section-title">元件說明</div>
+                        <p class="panel-desc" id="panelDesc">說明文字...</p>
+                    </div>
+
+                    <a href="" download="" class="btn btn-accent" id="downloadBtn" style="margin-top: 1rem; width: 100%; justify-content: center;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        下載此分解圖檔
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部圖庫總覽 -->
+        <div class="gallery-section">
+            <h2>分解圖檔與提取文字資料庫</h2>
+            <div style="margin-bottom: 1.5rem; color: var(--text-muted); font-size: 0.95rem;">
+                本系統已將原始圖檔 <strong style="color: var(--text-main);">AM248B-水耕配置.jpg</strong> 分解為 10 個核心組件。以下是全部元件的列表，包含獨立圖檔與文字提取內容。
+            </div>
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- 由 JS 動態生成 -->
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>AM248B 水耕農場配置系統 &copy; 2026. 視覺排版與圖面分解完成。</p>
+    </footer>
+
+    <script>
+        const componentsData = {
+            led_icon: {
+                title_zh: "LED 生長燈 (標籤與圖示)",
+                title_en: "LED Grow Lights (Icon & Label)",
+                desc: "位於系統頂部左側的圖示，指示 LED 生長燈的系統功能，補足垂直綠化或室內種植所需的植物生長光源。",
+                image: "images/components/led-grow-light-icon.png",
+                text_extracted: "LED 生長燈\n(LED Grow Lights)"
+            },
+            led_fixture: {
+                title_zh: "多層式 NFT 種植架 LED 燈條",
+                title_en: "LED Grow Lights Fixture",
+                desc: "安裝在種植架各層上方的實體 LED 燈具。圖中繪製為發出粉紅色光譜（紅藍混光）的長條形燈條，提供充足的光合作用能量。",
+                image: "images/components/led-light-fixture.png",
+                text_extracted: "（多層式 NFT 種植架上方燈管及粉紅色光照）"
+            },
+            sensor: {
+                title_zh: "環境傳感器",
+                title_en: "Environmental Sensors: T/H",
+                desc: "環境溫濕度監測儀，將大氣溫度與濕度即時反饋至控制面板，維持水耕溫室的最佳氣候。",
+                image: "images/components/environmental-sensor.png",
+                text_extracted: "環境傳感器\n(Environmental Sensors: T/H)"
+            },
+            venturi: {
+                title_zh: "文氏管與微奈米氣泡示意框",
+                title_en: "Venturi Principle & Micro-Nanobubbles",
+                desc: "放大圖框展示。左側為文氏管（Venturi）縮窄管徑造成流速加快、壓力下降吸入外部空氣的示意圖；右側展示其在水體中生成的微奈米極細微氣泡，大幅提升水中的含氧量。",
+                image: "images/components/venturi-nanobubble-diagram.png",
+                text_extracted: "文氏管原理示意\n(Venturi Principle Concept)\n微奈米氣泡\n(Micro-Nanobubbles)"
+            },
+            reservoir: {
+                title_zh: "營養液儲存槽 (500L)",
+                title_en: "Nutrient Solution Reservoir",
+                desc: "主營養液槽，標示規格為 500 公升，並內含水位、曝氣裝置與沉水幫浦（標有型號 MB248S）。作為所有水分循環的起點與終點。",
+                image: "images/components/nutrient-reservoir.png",
+                text_extracted: "營養液儲存槽\n(Nutrient Solution Reservoir, 500L)\nMB248S"
+            },
+            pump_up: {
+                title_zh: "供水馬達",
+                title_en: "Supply Pump",
+                desc: "位於儲存槽上方的泵浦。負責將槽內的營養液抽取向上，加壓送往四層種植架的頂端分配管路。",
+                image: "images/components/pump-upper.png",
+                text_extracted: "馬達\n(pump)"
+            },
+            pump_down: {
+                title_zh: "循環馬達",
+                title_en: "Circulation Pump",
+                desc: "位於水路下方的循環泵。在植物根部流出水分後，將水流經由主過濾器，送往文氏管混合增氧或回流至主儲存槽中。",
+                image: "images/components/pump-lower.png",
+                text_extracted: "馬達\n(pump)"
+            },
+            filter: {
+                title_zh: "空氣吸入口與主過濾器",
+                title_en: "Air In & Primary Filter",
+                desc: "底部進氣與雜質過濾部件。利用水流吸入空氣（Air In），並透過過濾器（Primary Filter）將回水雜質濾除，保護系統泵浦不被堵塞。",
+                image: "images/components/air-inlet-filter.png",
+                text_extracted: "Air In\n過濾器\n(Primary Filter)"
+            },
+            racks: {
+                title_zh: "多層式 NFT 種植架",
+                title_en: "NFT Growing Racks",
+                desc: "水耕系統核心硬體，共有四層。營養液流過各層通道，使種植其上的植物（Plants）根系浸潤在營養液膜中，多餘營養液流到最下層回水槽（Return Gutter）後回收循環。",
+                image: "images/components/nft-growing-racks.png",
+                text_extracted: "多層式 NFT 種植架 (NFT Growing Racks)\n植物 (Plants)\n回水槽 (Return Gutter)"
+            },
+            control_box: {
+                title_zh: "養分控制與監測系統",
+                title_en: "Nutrient Control & Monitoring System",
+                desc: "自動化與計量控制總成。上方為監測器主機（顯示 pH 值、EC 值與溫度），右側設有蠕動泵，下方分別為養分濃縮液 A、養分濃縮液 B 與 pH 調節劑，自動化調節整套水耕水質。",
+                image: "images/components/control-system-box.png",
+                text_extracted: "養分控制與監測系統 (Nutrient Control & Monitoring System)\npH 值 / EC 值 / 溫度\n監測器 (Controller)\n蠕動泵 (Peristaltic Pump)\n養分濃縮液A (Stock A)\n養分濃縮液B (Stock B)\npH 調節劑 (pH Adjuster)"
+            }
+        };
+
+        // 點選元件展示詳細資料
+        function selectComponent(key) {
+            // 清除現有的 active 狀態
+            document.querySelectorAll('.hotspot-overlay').forEach(el => el.classList.remove('active'));
+            
+            // 啟用當前熱區 active 狀態
+            const hotspot = document.getElementById('hs-' + key);
+            if (hotspot) hotspot.classList.add('active');
+
+            const data = componentsData[key];
+            if (!data) return;
+
+            // 隱藏 placeholder，顯示內容
+            document.getElementById('panelPlaceholder').style.display = 'none';
+            const content = document.getElementById('panelContent');
+            content.style.display = 'flex';
+
+            // 更新內容
+            document.getElementById('panelTitleZh').innerText = data.title_zh;
+            document.getElementById('panelTitleEn').innerText = data.title_en;
+            document.getElementById('panelCropImg').src = data.image;
+            document.getElementById('panelCropImg').alt = data.title_zh;
+            document.getElementById('panelExtractedText').innerText = data.text_extracted;
+            document.getElementById('panelDesc').innerText = data.desc;
+
+            // 更新下載按鈕
+            const dlBtn = document.getElementById('downloadBtn');
+            dlBtn.href = data.image;
+            dlBtn.download = data.image.split('/').pop();
+            
+            // 平滑滾動到面板 (如果在手機/窄螢幕上)
+            if (window.innerWidth < 1200) {
+                document.getElementById('detailsPanel').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // 複製提取文字
+        function copyExtractedText() {
+            const text = document.getElementById('panelExtractedText').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const copyBtn = document.querySelector('.copy-btn');
+                copyBtn.innerText = '已複製！';
+                copyBtn.style.background = 'rgba(16, 185, 129, 0.2)';
+                copyBtn.style.color = '#10b981';
+                setTimeout(() => {
+                    copyBtn.innerText = '複製文字';
+                    copyBtn.style.background = '';
+                    copyBtn.style.color = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('複製失敗: ', err);
+            });
+        }
+
+        // 初始化下方的全部元件圖庫
+        function initGallery() {
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = '';
+
+            for (const [key, data] of Object.entries(componentsData)) {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.onclick = () => {
+                    selectComponent(key);
+                    document.getElementById('diagramContainer').scrollIntoView({ behavior: 'smooth' });
+                };
+
+                // 將提取文字整理為單行簡介
+                const cleanText = data.text_extracted.replace(/\n/g, ' | ');
+
+                item.innerHTML = `
+                    <div class="gallery-img-wrapper">
+                        <img src="${data.image}" alt="${data.title_zh}">
+                    </div>
+                    <div class="gallery-info">
+                        <h4>${data.title_zh}</h4>
+                        <p style="color: var(--primary); font-size: 0.8rem; margin-bottom: 0.3rem;">${data.title_en}</p>
+                        <p style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.3;">
+                            ${cleanText}
+                        </p>
+                    </div>
+                `;
+                grid.appendChild(item);
+            }
+        }
+
+        // 初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            initGallery();
+        });
+    </script>
+<script>
+document.addEventListener('keydown', (e) => {
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") {
+        window.parent.postMessage('keydown-next', '*');
+    } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        window.parent.postMessage('keydown-prev', '*');
+    }
+});
+</script>
+</body>
+</html>

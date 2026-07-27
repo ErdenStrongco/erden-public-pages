@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深度活氧數據軌跡 - 互動式動態簡報</title>
+    <meta name="description" content="互動式簡報：展示微氣泡技術於水耕農場及養殖漁業之增氧維持效果與實績數據。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark-start: #030a16;
+            --bg-dark-end: #0c1c33;
+            --primary-cyan: #00f0ff;
+            --primary-green: #10b981;
+            --primary-yellow: #fbbf24;
+            --primary-purple: #a855f7;
+            --text-light: #ffffff;
+            --text-muted: #94a3b8;
+            --border-radius-lg: 24px;
+            --border-radius-md: 16px;
+            --border-radius-sm: 8px;
+            --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --transition-speed: 0.4s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark-start) 0%, var(--bg-dark-end) 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Dynamic Bubble Background */
+        .bubble-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 70%, rgba(0, 240, 255, 0.1) 100%);
+            border-radius: 50%;
+            bottom: -20px;
+            animation: rise linear infinite;
+        }
+
+        @keyframes rise {
+            0% {
+                transform: translateY(0) scale(1) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% {
+                transform: translateY(-105vh) scale(1.2) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Top Header */
+        header {
+            padding: 16px 30px;
+            background: rgba(3, 10, 22, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .logo-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, var(--primary-cyan) 0%, var(--primary-green) 100%);
+            width: 8px;
+            height: 28px;
+            border-radius: 4px;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Nav Menu Controls */
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+        }
+
+        .menu-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .menu-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            border: none;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 198, 255, 0.3);
+        }
+
+        /* Main Slides Workspace */
+        main {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 30px;
+            z-index: 1;
+        }
+
+        /* Slides Deck Container */
+        .slides-container {
+            width: 100%;
+            max-width: 1100px;
+            height: 600px;
+            position: relative;
+            background: rgba(13, 27, 49, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+        }
+
+        @media (max-width: 950px) {
+            main {
+                padding: 12px;
+            }
+            .slides-container {
+                height: auto;
+                min-height: 580px;
+            }
+        }
+
+        /* Individual Slide Base */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-speed) ease-in-out, transform var(--transition-speed) ease-in-out;
+            transform: scale(0.97) translateY(5px);
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1) translateY(0);
+        }
+
+        /* Slide Headers */
+        .slide-header-area {
+            margin-bottom: 12px;
+            animation: fadeInDown 0.5s ease-out forwards;
+        }
+
+        .slide-subtitle {
+            font-size: 0.9rem;
+            color: var(--primary-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .slide-title {
+            font-size: 1.7rem;
+            font-weight: 900;
+            color: #ffffff;
+        }
+
+        /* Slide Content Bodies */
+        .slide-body {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* --- SLIDE 1: OVERVIEW DASHBOARD (MATCHING STATIC REPLICA) --- */
+        .overview-layout {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            justify-content: space-between;
+        }
+
+        .graph-area {
+            height: 220px;
+            position: relative;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .y-axis-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 40px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-right: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        .y-axis-title {
+            position: absolute;
+            left: -12px;
+            top: -24px;
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .grid-lines {
+            position: absolute;
+            left: 40px;
+            right: 0;
+            top: 0;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .grid-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            border-top: 1px dashed rgba(255, 255, 255, 0.05);
+            height: 0;
+        }
+
+        .graph-svg-wrapper {
+            position: absolute;
+            left: 40px;
+            right: 0;
+            top: 0;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .graph-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .data-overlay-container {
+            position: absolute;
+            left: 40px;
+            right: 0;
+            top: 0;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .data-point-wrapper {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            pointer-events: auto;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .data-point-wrapper:hover {
+            transform: translate(-50%, -50%) scale(1.08);
+        }
+
+        .do-circle-badge {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: #081528;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .data-point-wrapper:hover .do-circle-badge {
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+        }
+
+        .point-baseline .do-circle-badge { border-color: var(--primary-yellow); }
+        .point-active .do-circle-badge { border-color: var(--primary-green); }
+        .point-inactive .do-circle-badge { border-color: var(--primary-cyan); }
+
+        .do-circle-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            line-height: 1;
+            color: #ffffff;
+        }
+
+        .do-circle-unit {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.48rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .do-circle-pill {
+            position: absolute;
+            bottom: -8px;
+            background: #000000;
+            border-radius: 4px;
+            padding: 1px 5px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.62rem;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .point-baseline .do-circle-pill { border-color: var(--primary-yellow); color: var(--primary-yellow); }
+        .point-active .do-circle-pill { border-color: var(--primary-green); color: var(--primary-green); }
+        .point-inactive .do-circle-pill { border-color: var(--primary-cyan); color: var(--primary-cyan); }
+
+        .point-label-text {
+            position: absolute;
+            left: 62px;
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: nowrap;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+            line-height: 1.2;
+        }
+
+        .point-click-tip {
+            font-size: 0.55rem;
+            color: var(--primary-cyan);
+            font-weight: normal;
+            display: block;
+            margin-top: 1px;
+            opacity: 0.8;
+        }
+
+        .data-point-node {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid #000000;
+            transform: translate(-50%, -50%);
+            z-index: 4;
+            pointer-events: none;
+        }
+        .point-baseline .data-point-node { background: var(--primary-yellow); box-shadow: 0 0 10px var(--primary-yellow); }
+        .point-active .data-point-node { background: var(--primary-green); box-shadow: 0 0 10px var(--primary-green); }
+        .point-inactive .data-point-node { background: var(--primary-cyan); box-shadow: 0 0 10px var(--primary-cyan); }
+
+        /* Coordinate placement */
+        .point-baseline { left: 19%; top: 62.5%; }
+        .point-active { left: 47%; top: 12.5%; }
+        .point-inactive { left: 78%; top: 31.25%; }
+
+        .point-baseline .do-circle-badge { transform: translate(-30px, -65px); }
+        .point-active .do-circle-badge { transform: translate(-80px, -35px); }
+        .point-inactive .do-circle-badge { transform: translate(-50px, -55px); }
+
+        .point-baseline .point-label-text { transform: translate(-30px, -65px); }
+        .point-active .point-label-text { transform: translate(-80px, -35px); }
+        .point-inactive .point-label-text { transform: translate(-50px, -55px); }
+
+        /* Parameter overlay */
+        .parameter-card {
+            position: absolute;
+            background: rgba(8, 22, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--border-radius-sm);
+            padding: 6px 10px;
+            width: 125px;
+            font-size: 0.7rem;
+            color: #ffffff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            z-index: 5;
+        }
+        .param-row { display: flex; justify-content: space-between; }
+        .param-label { color: var(--text-muted); }
+        .param-val { font-weight: 700; }
+
+        .point-baseline .parameter-card { left: 135px; top: 105px; }
+        .point-active .parameter-card { left: 300px; top: 10px; }
+        .point-inactive .parameter-card { left: 545px; top: 30px; }
+
+        /* Tanks row */
+        .tanks-row {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr 1.05fr;
+            gap: 24px;
+            width: 100%;
+            padding-left: 40px;
+            margin-top: 10px;
+        }
+
+        .tank-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .tank-image-container {
+            width: 100%;
+            aspect-ratio: 160 / 85;
+            border-radius: var(--border-radius-sm);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .tank-card:hover .tank-image-container {
+            transform: translateY(-3px);
+            border-color: var(--primary-cyan);
+            box-shadow: 0 6px 15px rgba(0, 240, 255, 0.25);
+        }
+
+        .tank-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .tank-label { font-size: 0.8rem; font-weight: 700; color: #ffffff; }
+        .timeline-label { font-size: 0.68rem; color: var(--text-muted); margin-top: -3px; }
+        .x-axis-title { position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-size: 0.72rem; color: var(--text-muted); font-weight: 700; }
+
+
+        /* --- SLIDES 2, 3, 4: DETAILED TAB LAYOUTS --- */
+        .detail-layout {
+            display: grid;
+            grid-template-columns: 1.25fr 1fr;
+            gap: 40px;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+        }
+
+        @media (max-width: 850px) {
+            .detail-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .slide {
+                padding: 20px;
+            }
+            .tanks-row {
+                grid-template-columns: 1fr;
+                padding-left: 0;
+            }
+            .graph-area {
+                height: 160px;
+            }
+        }
+
+        /* Large Image Visual Box */
+        .visual-display-box {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--card-shadow);
+        }
+
+        .visual-display-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .visual-water-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(to top, rgba(8, 22, 42, 0.9) 0%, rgba(8, 22, 42, 0.6) 70%, transparent 100%);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        .yellow-text { color: var(--primary-yellow); }
+        .green-text { color: var(--primary-green); }
+        .cyan-text { color: var(--primary-cyan); }
+
+        /* Left Info Cards / Gauges */
+        .info-analysis-pane {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .gauge-metric-block {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 16px 20px;
+            border-radius: var(--border-radius-md);
+        }
+
+        .svg-gauge-container {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+
+        .gauge-svg-circle {
+            transform: rotate(-90deg);
+        }
+
+        .circle-track {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.08);
+            stroke-width: 8;
+        }
+
+        .circle-fill-bar {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 226; /* 2 * PI * r (r=36) */
+            stroke-dashoffset: 226;
+            transition: stroke-dashoffset 1.2s cubic-bezier(0.1, 1, 0.2, 1);
+        }
+
+        .circle-fill-bar.yellow { stroke: var(--primary-yellow); }
+        .circle-fill-bar.green { stroke: var(--primary-green); }
+        .circle-fill-bar.cyan { stroke: var(--primary-cyan); }
+
+        .gauge-inner-val {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+        }
+
+        .metric-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .metric-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .metric-main-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .metric-sub-detail {
+            font-size: 0.72rem;
+            color: var(--text-light);
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 8px;
+            border-radius: 4px;
+            width: fit-content;
+            margin-top: 2px;
+        }
+
+        /* Descriptive Analysis Box */
+        .descriptive-card {
+            background: rgba(10, 23, 44, 0.5);
+            border-left: 4px solid #fff;
+            border-radius: 4px var(--border-radius-md) var(--border-radius-md) 4px;
+            padding: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .descriptive-card.yellow { border-left-color: var(--primary-yellow); background: rgba(251, 191, 36, 0.03); }
+        .descriptive-card.green { border-left-color: var(--primary-green); background: rgba(16, 185, 129, 0.03); }
+        .descriptive-card.cyan { border-left-color: var(--primary-cyan); background: rgba(0, 240, 255, 0.03); }
+
+        .analysis-headline {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #ffffff;
+        }
+        .analysis-text {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #d1d5db;
+        }
+
+        /* Saturation Color Indicator */
+        .color-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-left: 6px;
+            vertical-align: middle;
+            text-transform: uppercase;
+        }
+        .color-badge.low { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+        .color-badge.good { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .color-badge.ideal { background: rgba(6, 182, 212, 0.2); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.4); }
+
+        /* --- SLIDE FOOTER & CONTROLS --- */
+        .slide-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5;
+        }
+
+        .dots-navigation {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot:hover { background: rgba(255, 255, 255, 0.5); }
+        .dot.active {
+            background: var(--primary-cyan);
+            width: 24px;
+            border-radius: 4px;
+            box-shadow: 0 0 8px var(--primary-cyan);
+        }
+
+        .arrow-navigation-btns {
+            display: flex;
+            gap: 12px;
+        }
+
+        .arrow-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .arrow-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(0, 240, 255, 0.3);
+            color: var(--primary-cyan);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+        }
+
+        .arrow-btn:active { transform: scale(0.95); }
+
+        /* Keyframes */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Rising Bubbles Background -->
+    <div class="bubble-container" id="bubble-container"></div>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="logo-title">
+            <div class="logo-badge"></div>
+            <h1 class="logo-text">氣泡增養技術實績互動簡報</h1>
+        </div>
+        <nav class="nav-menu" aria-label="簡報頁面導覽">
+            <button class="menu-btn active" onclick="goToSlide(0)">數據軌跡總覽</button>
+            <button class="menu-btn" onclick="goToSlide(1)">階段一: 運轉前</button>
+            <button class="menu-btn" onclick="goToSlide(2)">階段二: 運轉5分鐘</button>
+            <button class="menu-btn" onclick="goToSlide(3)">階段三: 停機30分鐘</button>
+        </nav>
+    </header>
+
+    <!-- Main Presentation Workspace -->
+    <main>
+        <div class="slides-container">
+            
+            <!-- SLIDE 1: OVERVIEW DASHBOARD -->
+            <article class="slide active" id="slide-0">
+                <div class="slide-header-area">
+                    <span class="slide-subtitle">01 / Overview</span>
+                    <h2 class="slide-title">實測結論：深度活氧的數據軌跡</h2>
+                </div>
+                
+                <div class="slide-body">
+                    <div class="overview-layout">
+                        <!-- Chart Area -->
+                        <div class="graph-area">
+                            <div class="y-axis-container">
+                                <span class="y-axis-title">DO (mg/L)</span>
+                                <span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span><span>0</span>
+                            </div>
+                            <div class="grid-lines">
+                                <div class="grid-line" style="top: 0%;"></div>
+                                <div class="grid-line" style="top: 12.5%;"></div>
+                                <div class="grid-line" style="top: 25%;"></div>
+                                <div class="grid-line" style="top: 37.5%;"></div>
+                                <div class="grid-line" style="top: 50%;"></div>
+                                <div class="grid-line" style="top: 62.5%;"></div>
+                                <div class="grid-line" style="top: 75%;"></div>
+                                <div class="grid-line" style="top: 87.5%;"></div>
+                            </div>
+
+                            <!-- SVG Curve -->
+                            <div class="graph-svg-wrapper">
+                                <svg class="graph-svg" viewBox="0 0 800 200" preserveAspectRatio="none">
+                                    <defs>
+                                        <linearGradient id="deck-curve-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stop-color="#fbbf24" />
+                                            <stop offset="25%" stop-color="#10b981" />
+                                            <stop offset="60%" stop-color="#00f0ff" />
+                                            <stop offset="100%" stop-color="#3b82f6" />
+                                        </linearGradient>
+                                        <filter id="deck-glow" x="-20%" y="-20%" width="140%" height="140%">
+                                            <feGaussianBlur stdDeviation="4" result="blur" />
+                                            <feMerge>
+                                                <feMergeNode in="blur" />
+                                                <feMergeNode in="SourceGraphic" />
+                                            </feMerge>
+                                        </filter>
+                                    </defs>
+                                    <line x1="152" y1="125" x2="152" y2="200" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="4 4" />
+                                    <line x1="376" y1="25" x2="376" y2="200" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="4 4" />
+                                    <line x1="624" y1="62.5" x2="624" y2="200" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="4 4" />
+                                    <path d="M 50 135 C 90 130, 120 125, 152 125 C 230 125, 300 25, 376 25 C 460 25, 540 62.5, 624 62.5 C 680 62.5, 730 68, 770 70" 
+                                          fill="none" stroke="url(#deck-curve-grad)" stroke-width="4.5" filter="url(#deck-glow)" />
+                                </svg>
+                            </div>
+
+                            <!-- Overlaid Badge Elements (Clickable to change slide) -->
+                            <div class="data-overlay-container">
+                                <div class="data-point-wrapper point-baseline" onclick="goToSlide(1)">
+                                    <div class="data-point-node"></div>
+                                    <div class="do-circle-badge">
+                                        <span class="do-circle-value">3.0</span>
+                                        <span class="do-circle-unit">mg/L</span>
+                                        <div class="do-circle-pill">3.0</div>
+                                    </div>
+                                    <span class="point-label-text">運轉前<span class="point-click-tip">點擊查看詳情</span></span>
+                                    <div class="parameter-card">
+                                        <div class="param-row"><span class="param-label">水溫</span><span class="param-val">28.4°C</span></div>
+                                        <div class="param-row"><span class="param-label">飽和度</span><span class="param-val">約 39%</span></div>
+                                    </div>
+                                </div>
+
+                                <div class="data-point-wrapper point-active" onclick="goToSlide(2)">
+                                    <div class="data-point-node"></div>
+                                    <div class="do-circle-badge">
+                                        <span class="do-circle-value">7.0</span>
+                                        <span class="do-circle-unit">mg/L</span>
+                                        <div class="do-circle-pill">7.0</div>
+                                    </div>
+                                    <span class="point-label-text">運轉5分鐘<span class="point-click-tip">點擊查看詳情</span></span>
+                                    <div class="parameter-card">
+                                        <div class="param-row"><span class="param-label">水溫</span><span class="param-val">28.4°C</span></div>
+                                        <div class="param-row"><span class="param-label">飽和度</span><span class="param-val">約 90%</span></div>
+                                    </div>
+                                </div>
+
+                                <div class="data-point-wrapper point-inactive" onclick="goToSlide(3)">
+                                    <div class="data-point-node"></div>
+                                    <div class="do-circle-badge">
+                                        <span class="do-circle-value">5.5</span>
+                                        <span class="do-circle-unit">mg/L</span>
+                                        <div class="do-circle-pill">5.5</div>
+                                    </div>
+                                    <span class="point-label-text">停機30分鐘<span class="point-click-tip">點擊查看詳情</span></span>
+                                    <div class="parameter-card">
+                                        <div class="param-row"><span class="param-label">水溫</span><span class="param-val">28.4°C</span></div>
+                                        <div class="param-row"><span class="param-label">飽和度</span><span class="param-val">約 71%</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Water Tanks Row (Clickable to change slide) -->
+                        <div class="tanks-row">
+                            <div class="tank-card" onclick="goToSlide(1)">
+                                <div class="tank-image-container">
+                                    <img src="./images/slides/page10-left-tank-clean.jpg" alt="一般水體">
+                                </div>
+                                <span class="tank-label">一般水體</span>
+                                <span class="timeline-label">—— 基準狀態 ——</span>
+                            </div>
+                            
+                            <div class="tank-card" onclick="goToSlide(2)">
+                                <div class="tank-image-container">
+                                    <img src="./images/slides/page10-middle-tank-clean.jpg" alt="乳白微氣泡">
+                                </div>
+                                <span class="tank-label">乳白微細氣泡滿佈</span>
+                                <span class="timeline-label">—— 運轉中 ——</span>
+                                <span class="x-axis-title">時間軌跡軸</span>
+                            </div>
+                            
+                            <div class="tank-card" onclick="goToSlide(3)">
+                                <div class="tank-image-container">
+                                    <img src="./images/slides/page10-right-tank-clean.jpg" alt="清澈水體">
+                                </div>
+                                <span class="tank-label">水體恢復清澈，氧氣深度溶入</span>
+                                <span class="timeline-label">—— 停機後 ——</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer">
+                    <div class="dots-navigation">
+                        <span class="dot active" onclick="goToSlide(0)"></span>
+                        <span class="dot" onclick="goToSlide(1)"></span>
+                        <span class="dot" onclick="goToSlide(2)"></span>
+                        <span class="dot" onclick="goToSlide(3)"></span>
+                    </div>
+                    <div class="arrow-navigation-btns">
+                        <button class="arrow-btn" onclick="prevSlide()" aria-label="上一頁">←</button>
+                        <button class="arrow-btn" onclick="nextSlide()" aria-label="下一頁">→</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SLIDE 2: DETAIL BASELINE -->
+            <article class="slide" id="slide-1">
+                <div class="slide-header-area">
+                    <span class="slide-subtitle">02 / Baseline State</span>
+                    <h2 class="slide-title">階段一：設備啟動前 (Baseline)</h2>
+                </div>
+
+                <div class="slide-body">
+                    <div class="detail-layout">
+                        <!-- Left Image Display -->
+                        <div class="visual-display-box">
+                            <img src="./images/slides/page10-left-tank-clean.jpg" alt="一般水體細節">
+                            <div class="visual-water-overlay yellow-text">目前狀態：一般水體</div>
+                        </div>
+                        
+                        <!-- Right Info Pane -->
+                        <div class="info-analysis-pane">
+                            <div class="gauge-metric-block">
+                                <div class="svg-gauge-container">
+                                    <svg class="gauge-svg-circle" viewBox="0 0 80 80" width="80" height="80">
+                                        <circle class="circle-track" cx="40" cy="40" r="36" />
+                                        <circle class="circle-fill-bar yellow" id="gauge-1" cx="40" cy="40" r="36" />
+                                    </svg>
+                                    <div class="gauge-inner-val">39%</div>
+                                </div>
+                                <div class="metric-details">
+                                    <span class="metric-title">當前溶解氧量</span>
+                                    <span class="metric-main-value" style="color:var(--primary-yellow);">3.0 mg/L</span>
+                                    <span class="metric-sub-detail">水溫: 28.4°C (100%飽和對照: 7.73 mg/L) <span class="color-badge low">偏低</span></span>
+                                </div>
+                            </div>
+
+                            <div class="descriptive-card yellow">
+                                <h3 class="analysis-headline">水體狀況分析與生存風險：</h3>
+                                <p class="analysis-text">
+                                    設備啟動前，水體溶氧處於未經處理的<b>常規基準狀態 (DO 3.0 mg/L)</b>。由於缺乏增氧機制，水中的飽和度僅為 39%，處於嚴重的<b>偏低缺氧範圍</b>。此狀態對大多數魚類、蝦類及水耕植物根部而言均面臨極高的缺氧生存風險，長期會導致作物發育不良或養殖生物生長窒息。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer">
+                    <div class="dots-navigation">
+                        <span class="dot" onclick="goToSlide(0)"></span>
+                        <span class="dot active" onclick="goToSlide(1)"></span>
+                        <span class="dot" onclick="goToSlide(2)"></span>
+                        <span class="dot" onclick="goToSlide(3)"></span>
+                    </div>
+                    <div class="arrow-navigation-btns">
+                        <button class="arrow-btn" onclick="prevSlide()">←</button>
+                        <button class="arrow-btn" onclick="nextSlide()">→</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SLIDE 3: DETAIL ACTIVE -->
+            <article class="slide" id="slide-2">
+                <div class="slide-header-area">
+                    <span class="slide-subtitle">03 / Active Operation</span>
+                    <h2 class="slide-title">階段二：設備運轉 5 分鐘後 (Active)</h2>
+                </div>
+
+                <div class="slide-body">
+                    <div class="detail-layout">
+                        <div class="visual-display-box">
+                            <img src="./images/slides/page10-middle-tank-clean.jpg" alt="乳白微氣泡滿佈細節">
+                            <div class="visual-water-overlay green-text">目前狀態：乳白微細氣泡滿佈</div>
+                        </div>
+                        
+                        <div class="info-analysis-pane">
+                            <div class="gauge-metric-block">
+                                <div class="svg-gauge-container">
+                                    <svg class="gauge-svg-circle" viewBox="0 0 80 80" width="80" height="80">
+                                        <circle class="circle-track" cx="40" cy="40" r="36" />
+                                        <circle class="circle-fill-bar green" id="gauge-2" cx="40" cy="40" r="36" />
+                                    </svg>
+                                    <div class="gauge-inner-val">90%</div>
+                                </div>
+                                <div class="metric-details">
+                                    <span class="metric-title">運轉5分鐘溶解氧量</span>
+                                    <span class="metric-main-value" style="color:var(--primary-green);">7.0 mg/L</span>
+                                    <span class="metric-sub-detail">水溫: 28.4°C (100%飽和對照: 7.73 mg/L) <span class="color-badge ideal">理想</span></span>
+                                </div>
+                            </div>
+
+                            <div class="descriptive-card green">
+                                <h3 class="analysis-headline">極速增氧與微氣泡超大接觸面：</h3>
+                                <p class="analysis-text">
+                                    當 <b>AM248B 系統運轉僅需短短 5 分鐘</b>，即能於水體中激發導入數以億計的微細氣泡。水體外觀呈現乳白色的霧狀微細氣泡覆蓋。微細氣泡在水中提供無與倫比的氣液接觸總表面積，令溶氧量在極短時間內<b>躍升至 7.0 mg/L，飽和度急劇攀升至 90%</b>，迅速達到極為理想的富氧生存環境。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer">
+                    <div class="dots-navigation">
+                        <span class="dot" onclick="goToSlide(0)"></span>
+                        <span class="dot" onclick="goToSlide(1)"></span>
+                        <span class="dot active" onclick="goToSlide(2)"></span>
+                        <span class="dot" onclick="goToSlide(3)"></span>
+                    </div>
+                    <div class="arrow-navigation-btns">
+                        <button class="arrow-btn" onclick="prevSlide()">←</button>
+                        <button class="arrow-btn" onclick="nextSlide()">→</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SLIDE 4: DETAIL INACTIVE -->
+            <article class="slide" id="slide-3">
+                <div class="slide-header-area">
+                    <span class="slide-subtitle">04 / Long-term Retention</span>
+                    <h2 class="slide-title">階段三：設備停止 30 分鐘後 (Inactive)</h2>
+                </div>
+
+                <div class="slide-body">
+                    <div class="detail-layout">
+                        <div class="visual-display-box">
+                            <img src="./images/slides/page10-right-tank-clean.jpg" alt="氧氣深度溶入細節">
+                            <div class="visual-water-overlay cyan-text">目前狀態：水體恢復清澈，氧氣深度溶入</div>
+                        </div>
+                        
+                        <div class="info-analysis-pane">
+                            <div class="gauge-metric-block">
+                                <div class="svg-gauge-container">
+                                    <svg class="gauge-svg-circle" viewBox="0 0 80 80" width="80" height="80">
+                                        <circle class="circle-track" cx="40" cy="40" r="36" />
+                                        <circle class="circle-fill-bar cyan" id="gauge-3" cx="40" cy="40" r="36" />
+                                    </svg>
+                                    <div class="gauge-inner-val">71%</div>
+                                </div>
+                                <div class="metric-details">
+                                    <span class="metric-title">停機30分鐘溶解氧量</span>
+                                    <span class="metric-main-value" style="color:var(--primary-cyan);">5.5 mg/L</span>
+                                    <span class="metric-sub-detail">水溫: 28.4°C (100%飽和對照: 7.73 mg/L) <span class="color-badge good">良好</span></span>
+                                </div>
+                            </div>
+
+                            <div class="descriptive-card cyan">
+                                <h3 class="analysis-headline">深度溶解與長效維持紅利：</h3>
+                                <p class="analysis-text">
+                                    在<b>設備停機長達 30 分鐘後</b>，肉眼可見的乳白色微細氣泡雖多已消散或逸出，水體重新恢復清澈。然而實測結果顯示，<b>溶解氧量依然強勢維持在 5.5 mg/L，飽和度達 71%</b>。這代表大部分氧氣並非只是以氣泡狀態漂浮，而是經由高壓深度溶解機制<b>真正融入水分子中</b>。這證實了微氣泡技術具有強悍的「長效溶氧維持效果」，大幅節省運作功耗。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slide-footer">
+                    <div class="dots-navigation">
+                        <span class="dot" onclick="goToSlide(0)"></span>
+                        <span class="dot" onclick="goToSlide(1)"></span>
+                        <span class="dot" onclick="goToSlide(2)"></span>
+                        <span class="dot active" onclick="goToSlide(3)"></span>
+                    </div>
+                    <div class="arrow-navigation-btns">
+                        <button class="arrow-btn" onclick="prevSlide()">←</button>
+                        <button class="arrow-btn" onclick="nextSlide()">→</button>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+        const menuBtns = document.querySelectorAll('.menu-btn');
+
+        // SVG progress gauge offsets (2 * PI * r = 2 * 3.14159 * 36 = 226.19)
+        const totalLength = 226;
+        const gaugePercentages = [39, 90, 71]; // Baseline, Active, Inactive
+
+        function updateGauges() {
+            // Animate SVG circle progress bars based on current active slide
+            for (let i = 1; i <= 3; i++) {
+                const bar = document.getElementById(`gauge-${i}`);
+                if (!bar) continue;
+
+                if (currentSlide === i) {
+                    const percent = gaugePercentages[i - 1];
+                    const offset = totalLength - (totalLength * percent) / 100;
+                    // Trigger animation using timeout
+                    setTimeout(() => {
+                        bar.style.strokeDashoffset = offset;
+                    }, 100);
+                } else {
+                    // Reset to un-animated state
+                    bar.style.strokeDashoffset = totalLength;
+                }
+            }
+        }
+
+        function goToSlide(index) {
+            if (index < 0 || index >= slides.length) return;
+            
+            // Remove active status from old slide
+            slides[currentSlide].classList.remove('active');
+            dots[currentSlide].classList.remove('active');
+            menuBtns[currentSlide].classList.remove('active');
+
+            // Apply active status to new slide
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+            menuBtns[currentSlide].classList.add('active');
+
+            updateGauges();
+        }
+
+        function nextSlide() {
+            const nextIdx = (currentSlide + 1) % slides.length;
+            goToSlide(nextIdx);
+        }
+
+        function prevSlide() {
+            const prevIdx = (currentSlide - 1 + slides.length) % slides.length;
+            goToSlide(prevIdx);
+        }
+
+        // Keyboard Arrow Keys Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Generate rising bubbles decoration
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('bubble-container');
+            const numBubbles = 25;
+            
+            for (let i = 0; i < numBubbles; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                
+                const size = Math.random() * 8 + 4;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${Math.random() * 100}%`;
+                bubble.style.animationDuration = `${Math.random() * 8 + 6}s`;
+                bubble.style.animationDelay = `${Math.random() * 10}s`;
+                bubble.style.opacity = Math.random() * 0.4 + 0.1;
+                
+                container.appendChild(bubble);
+            }
+
+            // Initial gauge setup
+            updateGauges();
+        });
+    </script>
+<script>
+document.addEventListener('keydown', (e) => {
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") {
+        window.parent.postMessage('keydown-next', '*');
+    } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        window.parent.postMessage('keydown-prev', '*');
+    }
+});
+</script>
+</body>
+</html>

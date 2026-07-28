@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微氣泡水耕與養殖漁業 - 互動式簡報</title>
+    <meta name="description" content="互動式簡報：展示微氣泡技術於水耕農場及養殖漁業之增氧維持效果與實績數據。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0b396b;
+            --primary-green: #0a6530;
+            --primary-blue-light: #3b82f6;
+            --primary-green-light: #10b981;
+            --light-blue-bg: #ebf3fc;
+            --light-green-bg: #edf7ed;
+            --text-dark: #1f2937;
+            --text-light: #ffffff;
+            --gray-light: #f3f4f6;
+            --transition-speed: 0.5s;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Header */
+        header {
+            padding: 16px 30px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .logo-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+            width: 8px;
+            height: 28px;
+            border-radius: 4px;
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Presentation Mode Controls */
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+        }
+
+        .menu-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .menu-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border: none;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Main Workspace */
+        main {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Slides Container */
+        .slides-container {
+            width: 100%;
+            max-width: 1100px;
+            height: 600px;
+            position: relative;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+        }
+
+        /* Individual Slide Base */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-speed) ease-in-out, transform var(--transition-speed) ease-in-out;
+            transform: scale(0.98);
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
+
+        /* Slide Content Components */
+        .slide-header {
+            margin-bottom: 20px;
+            animation: fadeInDown 0.6s ease-out forwards;
+        }
+
+        .slide-subtitle {
+            font-size: 0.95rem;
+            color: #3b82f6;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .slide-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .slide-body {
+            flex-grow: 1;
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* SLIDE 1: OVERVIEW Layout */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            width: 100%;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .overview-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .overview-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 60%, rgba(15, 23, 42, 0.9));
+            z-index: 2;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .overview-card.blue:hover {
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .overview-card.green:hover {
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .card-tag {
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 8px 24px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .card-tag.blue { background-color: var(--primary-blue); }
+        .card-tag.green { background-color: var(--primary-green); }
+
+        .card-img-container {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .card-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-img-overlay {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            z-index: 3;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .card-do-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-top: 8px;
+            z-index: 3;
+            position: relative;
+        }
+
+        .card-do-value span {
+            font-size: 1.8rem;
+            color: #ffffff;
+        }
+
+        .card-click-tip {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 10px;
+            z-index: 3;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .overview-card:hover .card-click-tip {
+            color: #ffffff;
+        }
+
+        .vs-badge {
+            font-size: 2.5rem;
+            font-weight: 900;
+            font-style: italic;
+            background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        /* SLIDE 2 & 3: DETAIL VIEW LAYOUTS */
+        .detail-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            width: 100%;
+            height: 100%;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .detail-media {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            aspect-ratio: 1.1;
+            position: relative;
+        }
+
+        .detail-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .detail-media-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 16px 20px;
+            text-align: center;
+            font-size: 1.15rem;
+            font-weight: 700;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(5px);
+        }
+
+        .detail-media-caption.blue { color: #60a5fa; }
+        .detail-media-caption.green { color: #34d399; }
+
+        .detail-info {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Metric Animation block */
+        .metric-block {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 16px 24px;
+            border-radius: 16px;
+        }
+
+        .gauge-container {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+
+        .gauge-svg {
+            transform: rotate(-90deg);
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: rgba(255,255,255,0.1);
+            stroke-width: 8;
+        }
+
+        .gauge-bar {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease-out;
+            stroke-dasharray: 226; /* 2 * PI * r (r=36) */
+            stroke-dashoffset: 226;
+        }
+
+        .gauge-bar.blue { stroke: #3b82f6; }
+        .gauge-bar.green { stroke: #10b981; }
+
+        .gauge-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .metric-label-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .metric-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .detail-bullets {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .bullet-item {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .bullet-icon-wrapper {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .bullet-icon-wrapper img {
+            width: 20px;
+            height: 20px;
+            object-fit: cover;
+        }
+
+        .bullet-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .bullet-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .bullet-desc {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        /* SLIDE 4: CONCLUSION LAYOUT */
+        .conclusion-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            width: 100%;
+            height: 100%;
+            gap: 40px;
+            align-items: center;
+        }
+
+        /* Chart visualizer */
+        .chart-card {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 24px;
+            border-radius: 20px;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .chart-title {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .chart-bars {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 180px;
+            padding-top: 20px;
+        }
+
+        .chart-bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 80px;
+        }
+
+        .chart-bar-fill {
+            width: 40px;
+            border-radius: 8px 8px 0 0;
+            transition: height 1s ease-out;
+            height: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        .chart-bar-fill.blue {
+            background: linear-gradient(to top, #1d4ed8, #3b82f6);
+        }
+
+        .chart-bar-fill.green {
+            background: linear-gradient(to top, #047857, #10b981);
+        }
+
+        .chart-bar-value {
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .chart-bar-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-align: center;
+            word-break: keep-all;
+        }
+
+        /* Conclusion message box */
+        .conclusion-box {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .conclusion-highlight-card {
+            background: linear-gradient(135deg, rgba(11, 57, 107, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 24px;
+            border-radius: 16px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .conclusion-highlight-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+            box-shadow: inset 0 0 20px rgba(59, 130, 246, 0.1);
+            pointer-events: none;
+        }
+
+        .conclusion-icon-lg {
+            width: 54px;
+            height: 54px;
+            background: rgba(59, 130, 246, 0.15);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            flex-shrink: 0;
+        }
+
+        .conclusion-icon-lg img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .conclusion-text-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .conclusion-card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+
+        .conclusion-card-desc {
+            font-size: 0.95rem;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .conclusion-bullets {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-left: 8px;
+        }
+
+        .conclusion-bullet-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: #94a3b8;
+        }
+
+        .conclusion-bullet-item::before {
+            content: '✓';
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        /* Slide Footer & Navigation controls */
+        .slide-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5;
+        }
+
+        .dots-container {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .dot.active {
+            background: #3b82f6;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .slide-btns {
+            display: flex;
+            gap: 12px;
+        }
+
+        .arrow-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .arrow-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .arrow-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Keyframes */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .slides-container {
+                height: auto;
+                min-height: 550px;
+            }
+            .slide {
+                position: relative;
+                opacity: 0;
+                display: none;
+                height: auto;
+                min-height: 500px;
+            }
+            .slide.active {
+                opacity: 1;
+                display: flex;
+            }
+            .detail-layout, .conclusion-layout, .overview-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .slide-body {
+                overflow: visible;
+                padding-bottom: 20px;
+            }
+            .vs-badge {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Bar Navigation -->
+    <header>
+        <div class="logo-title">
+            <div class="logo-badge"></div>
+            <div class="logo-text">氣泡增養技術實績簡報</div>
+        </div>
+        <nav class="nav-menu" aria-label="簡報頁面導覽">
+            <button class="menu-btn active" onclick="goToSlide(0)">總覽對比</button>
+            <button class="menu-btn" onclick="goToSlide(1)">運轉5分鐘</button>
+            <button class="menu-btn" onclick="goToSlide(2)">停止30分鐘</button>
+            <button class="menu-btn" onclick="goToSlide(3)">總結效益</button>
+        </nav>
+    </header>
+
+    <!-- Main Deck Workspace -->
+    <main>
+        <section class="slides-container" aria-label="簡報投影片">
+            
+            <!-- SLIDE 1: OVERVIEW DASHBOARD -->
+            <article class="slide active" id="slide-0" aria-hidden="false">
+                <div class="slide-header">
+                    <span class="slide-subtitle">01 / Overview</span>
+                    <h2 class="slide-title">水耕農場與養殖漁業 - 微氣泡增氧實績對比</h2>
+                </div>
+                <div class="slide-body">
+                    <div class="overview-grid">
+                        <!-- Left Option -->
+                        <div class="overview-card blue" onclick="goToSlide(1)" role="button" tabindex="0" aria-label="前往運轉5分鐘後詳細解析">
+                            <span class="card-tag blue">設備運轉 5 分鐘後</span>
+                            <div class="card-img-container">
+                                <img src="./images/slides/left-tank.jpg" alt="設備運轉 5 分鐘水體">
+                                <span class="card-img-overlay">水體充滿乳白色微氣泡</span>
+                            </div>
+                            <div class="card-do-value">溶氧量：<span>7.0</span> mg/L</div>
+                            <p class="card-click-tip">點擊查看詳細解析</p>
+                        </div>
+                        
+                        <!-- Center Divider -->
+                        <div class="vs-badge">VS</div>
+                        
+                        <!-- Right Option -->
+                        <div class="overview-card green" onclick="goToSlide(2)" role="button" tabindex="0" aria-label="前往停止30分鐘後詳細解析">
+                            <span class="card-tag green">設備停止 30 分鐘後</span>
+                            <div class="card-img-container">
+                                <img src="./images/slides/right-tank.jpg" alt="設備停止 30 分鐘水體">
+                                <span class="card-img-overlay">水體漸漸變清澈透明</span>
+                            </div>
+                            <div class="card-do-value">溶氧量：<span>5.5</span> mg/L</div>
+                            <p class="card-click-tip">點擊查看詳細解析</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bottom controls -->
+                <div class="slide-footer">
+                    <div class="dots-container" role="tablist" aria-label="投影片點選器">
+                        <button class="dot active" onclick="goToSlide(0)" role="tab" aria-selected="true" aria-label="投影片 1"></button>
+                        <button class="dot" onclick="goToSlide(1)" role="tab" aria-selected="false" aria-label="投影片 2"></button>
+                        <button class="dot" onclick="goToSlide(2)" role="tab" aria-selected="false" aria-label="投影片 3"></button>
+                        <button class="dot" onclick="goToSlide(3)" role="tab" aria-selected="false" aria-label="投影片 4"></button>
+                    </div>
+                    <div class="slide-btns">
+                        <button class="arrow-btn" onclick="prevSlide()" aria-label="上一張投影片">←</button>
+                        <button class="arrow-btn" onclick="nextSlide()" aria-label="下一張投影片">→</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SLIDE 2: STATE 1 - 5 MINUTES -->
+            <article class="slide" id="slide-1" aria-hidden="true">
+                <div class="slide-header">
+                    <span class="slide-subtitle">02 / Active State</span>
+                    <h2 class="slide-title">微氣泡大量導入 - 運轉5分鐘階段</h2>
+                </div>
+                <div class="slide-body">
+                    <div class="detail-layout">
+                        <!-- Media frame -->
+                        <div class="detail-media">
+                            <img src="./images/slides/left-tank.jpg" alt="設備運轉 5 分鐘水體細節">
+                            <div class="detail-media-caption blue">水體充滿乳白色微氣泡</div>
+                        </div>
+                        
+                        <!-- Details -->
+                        <div class="detail-info">
+                            <!-- Gauge DO Value -->
+                            <div class="metric-block">
+                                <div class="gauge-container">
+                                    <svg class="gauge-svg" width="80" height="80">
+                                        <circle class="gauge-bg" cx="40" cy="40" r="36" />
+                                        <circle class="gauge-bar blue" id="gauge-blue" cx="40" cy="40" r="36" />
+                                    </svg>
+                                    <div class="gauge-text">70%</div>
+                                </div>
+                                <div class="metric-label-group">
+                                    <span class="metric-label">實測溶氧量 (Dissolved Oxygen)</span>
+                                    <span class="metric-value">7.0 mg/L</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Bullets description -->
+                            <div class="detail-bullets">
+                                <div class="bullet-item">
+                                    <div class="bullet-icon-wrapper">
+                                        <img src="./images/slides/bubble-icon.jpg" alt="氣泡圖示">
+                                    </div>
+                                    <div class="bullet-content">
+                                        <span class="bullet-title">高密度微氣泡導入</span>
+                                        <span class="bullet-desc">系統高速將大量空氣或純氧剪切成微米級氣泡，迅速佈滿整個水體，呈現乳白色乳化現象。</span>
+                                    </div>
+                                </div>
+                                <div class="bullet-item">
+                                    <div class="bullet-icon-wrapper">
+                                        <img src="./images/slides/lightbulb-icon.jpg" alt="燈泡圖示">
+                                    </div>
+                                    <div class="bullet-content">
+                                        <span class="bullet-title">大幅度增加接觸面積</span>
+                                        <span class="bullet-desc">微氣泡之超大比表面積極大化了氣液接觸面積，使溶氧傳質效率呈指數級提升，溶氧量快速上漲。</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-footer">
+                    <div class="dots-container" role="tablist" aria-label="投影片點選器">
+                        <button class="dot" onclick="goToSlide(0)" role="tab" aria-selected="false" aria-label="投影片 1"></button>
+                        <button class="dot active" onclick="goToSlide(1)" role="tab" aria-selected="true" aria-label="投影片 2"></button>
+                        <button class="dot" onclick="goToSlide(2)" role="tab" aria-selected="false" aria-label="投影片 3"></button>
+                        <button class="dot" onclick="goToSlide(3)" role="tab" aria-selected="false" aria-label="投影片 4"></button>
+                    </div>
+                    <div class="slide-btns">
+                        <button class="arrow-btn" onclick="prevSlide()" aria-label="上一張投影片">←</button>
+                        <button class="arrow-btn" onclick="nextSlide()" aria-label="下一張投影片">→</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SLIDE 3: STATE 2 - 30 MINUTES -->
+            <article class="slide" id="slide-2" aria-hidden="true">
+                <div class="slide-header">
+                    <span class="slide-subtitle">03 / Idle State</span>
+                    <h2 class="slide-title">高效溶氧持久維持 - 設備停止30分鐘</h2>
+                </div>
+                <div class="slide-body">
+                    <div class="detail-layout">
+                        <!-- Media frame -->
+                        <div class="detail-media">
+                            <img src="./images/slides/right-tank.jpg" alt="設備停止 30 分鐘水體細節">
+                            <div class="detail-media-caption green">水體漸漸變清澈透明</div>
+                        </div>
+                        
+                        <!-- Details -->
+                        <div class="detail-info">
+                            <!-- Gauge DO Value -->
+                            <div class="metric-block">
+                                <div class="gauge-container">
+                                    <svg class="gauge-svg" width="80" height="80">
+                                        <circle class="gauge-bg" cx="40" cy="40" r="36" />
+                                        <circle class="gauge-bar green" id="gauge-green" cx="40" cy="40" r="36" />
+                                    </svg>
+                                    <div class="gauge-text">55%</div>
+                                </div>
+                                <div class="metric-label-group">
+                                    <span class="metric-label">實測溶氧量 (Dissolved Oxygen)</span>
+                                    <span class="metric-value">5.5 mg/L</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Bullets description -->
+                            <div class="detail-bullets">
+                                <div class="bullet-item">
+                                    <div class="bullet-icon-wrapper">
+                                        <img src="./images/slides/leaf-icon.jpg" alt="樹葉圖示">
+                                    </div>
+                                    <div class="bullet-content">
+                                        <span class="bullet-title">氣泡消散，澄清度恢復</span>
+                                        <span class="bullet-desc">設備停止30分鐘後，懸浮微氣泡部分緩慢上升逸出，或因收縮直接溶解於水，水體逐漸恢復清澈。</span>
+                                    </div>
+                                </div>
+                                <div class="bullet-item">
+                                    <div class="bullet-icon-wrapper">
+                                        <img src="./images/slides/lightbulb-icon.jpg" alt="燈泡圖示">
+                                    </div>
+                                    <div class="bullet-content">
+                                        <span class="bullet-title">令人矚目的溶氧持久性</span>
+                                        <span class="bullet-desc">氣泡雖消散，但溶氧量仍維持在 5.5 mg/L 的高水平。這證明了氣泡內的氧氣已部分「溶入水體」成為溶解氧，而非僅僅以氣泡形式浮於表面。</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-footer">
+                    <div class="dots-container" role="tablist" aria-label="投影片點選器">
+                        <button class="dot" onclick="goToSlide(0)" role="tab" aria-selected="false" aria-label="投影片 1"></button>
+                        <button class="dot" onclick="goToSlide(1)" role="tab" aria-selected="false" aria-label="投影片 2"></button>
+                        <button class="dot active" onclick="goToSlide(2)" role="tab" aria-selected="true" aria-label="投影片 3"></button>
+                        <button class="dot" onclick="goToSlide(3)" role="tab" aria-selected="false" aria-label="投影片 4"></button>
+                    </div>
+                    <div class="slide-btns">
+                        <button class="arrow-btn" onclick="prevSlide()" aria-label="上一張投影片">←</button>
+                        <button class="arrow-btn" onclick="nextSlide()" aria-label="下一張投影片">→</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SLIDE 4: CONCLUSION -->
+            <article class="slide" id="slide-3" aria-hidden="true">
+                <div class="slide-header">
+                    <span class="slide-subtitle">04 / Performance Conclusion</span>
+                    <h2 class="slide-title">數據總結與核心效益分析</h2>
+                </div>
+                <div class="slide-body">
+                    <div class="conclusion-layout">
+                        <!-- Chart block -->
+                        <div class="chart-card">
+                            <h3 class="chart-title">水體溶氧量對比 (mg/L)</h3>
+                            <div class="chart-bars">
+                                <!-- Bar 1 -->
+                                <div class="chart-bar-container">
+                                    <div class="chart-bar-fill blue" id="bar-blue">
+                                        <span class="chart-bar-value">7.0</span>
+                                    </div>
+                                    <span class="chart-bar-label">運轉5分鐘後</span>
+                                </div>
+                                <!-- Bar 2 -->
+                                <div class="chart-bar-container">
+                                    <div class="chart-bar-fill green" id="bar-green">
+                                        <span class="chart-bar-value">5.5</span>
+                                    </div>
+                                    <span class="chart-bar-label">停止30分鐘後</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Conclusion Text info -->
+                        <div class="conclusion-box">
+                            <div class="conclusion-highlight-card">
+                                <div class="conclusion-icon-lg">
+                                    <img src="./images/slides/lightbulb-icon.jpg" alt="總結燈泡圖示">
+                                </div>
+                                <div class="conclusion-text-container">
+                                    <h4 class="conclusion-card-title">微氣泡具備優異的「溶氧維持效果」</h4>
+                                    <p class="conclusion-card-desc">
+                                        實驗結果證實：微氣泡所導入的氧氣，<strong>並非僅僅停留於表面</strong>，而是能<strong>有效深層溶入水體中</strong>。在設備關閉半小時後，水體依然能保持充足的氧氣含量，此長效機制對水耕根系發育及養殖魚蝦生理代謝至關重要。
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <ul class="conclusion-bullets" aria-label="核心效益清單">
+                                <li class="conclusion-bullet-item"><strong>根系健康</strong>：水耕根系在持續高溶氧環境下，養分吸收率倍增，能有效抑制厭氧腐根菌的孳生。</li>
+                                <li class="conclusion-bullet-item"><strong>省電節能</strong>：無須24小時持續開啟曝氣設備，間歇運轉即可維持穩定的高溶氧水質。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-footer">
+                    <div class="dots-container" role="tablist" aria-label="投影片點選器">
+                        <button class="dot" onclick="goToSlide(0)" role="tab" aria-selected="false" aria-label="投影片 1"></button>
+                        <button class="dot" onclick="goToSlide(1)" role="tab" aria-selected="false" aria-label="投影片 2"></button>
+                        <button class="dot" onclick="goToSlide(2)" role="tab" aria-selected="false" aria-label="投影片 3"></button>
+                        <button class="dot active" onclick="goToSlide(3)" role="tab" aria-selected="true" aria-label="投影片 4"></button>
+                    </div>
+                    <div class="slide-btns">
+                        <button class="arrow-btn" onclick="prevSlide()" aria-label="上一張投影片">←</button>
+                        <button class="arrow-btn" onclick="nextSlide()" aria-label="下一張投影片">→</button>
+                    </div>
+                </div>
+            </article>
+
+        </section>
+    </main>
+
+    <!-- Slide Deck Logic -->
+    <script>
+        let currentSlideIdx = 0;
+        const totalSlides = 4;
+        
+        // Element caching
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+        const menuBtns = document.querySelectorAll('.menu-btn');
+        
+        // Circular gauge elements
+        const gaugeBlue = document.getElementById('gauge-blue');
+        const gaugeGreen = document.getElementById('gauge-green');
+        
+        // Bar chart elements
+        const barBlue = document.getElementById('bar-blue');
+        const barGreen = document.getElementById('bar-green');
+
+        function goToSlide(index) {
+            if (index < 0 || index >= totalSlides) return;
+            
+            // Deactivate current slide
+            slides[currentSlideIdx].classList.remove('active');
+            slides[currentSlideIdx].setAttribute('aria-hidden', 'true');
+            dots[currentSlideIdx].classList.remove('active');
+            dots[currentSlideIdx].setAttribute('aria-selected', 'false');
+            menuBtns[currentSlideIdx].classList.remove('active');
+            
+            // Update index
+            currentSlideIdx = index;
+            
+            // Activate target slide
+            slides[currentSlideIdx].classList.add('active');
+            slides[currentSlideIdx].setAttribute('aria-hidden', 'false');
+            dots[currentSlideIdx].classList.add('active');
+            dots[currentSlideIdx].setAttribute('aria-selected', 'true');
+            menuBtns[currentSlideIdx].classList.add('active');
+            
+            // Trigger dynamic animations for specific slides
+            handleSlideAnimations(currentSlideIdx);
+        }
+
+        function nextSlide() {
+            let targetIdx = (currentSlideIdx + 1) % totalSlides;
+            goToSlide(targetIdx);
+        }
+
+        function prevSlide() {
+            let targetIdx = (currentSlideIdx - 1 + totalSlides) % totalSlides;
+            goToSlide(targetIdx);
+        }
+
+        function handleSlideAnimations(index) {
+            // Reset gauges
+            if (gaugeBlue) gaugeBlue.style.strokeDashoffset = '226';
+            if (gaugeGreen) gaugeGreen.style.strokeDashoffset = '226';
+            
+            // Reset chart bars
+            if (barBlue) barBlue.style.height = '0px';
+            if (barGreen) barGreen.style.height = '0px';
+
+            if (index === 1) {
+                // Animate blue gauge to 70% (7.0 mg/L out of 10 max)
+                // 226 * (1 - 0.70) = 67.8
+                setTimeout(() => {
+                    if (gaugeBlue) gaugeBlue.style.strokeDashoffset = '67.8';
+                }, 150);
+            } else if (index === 2) {
+                // Animate green gauge to 55% (5.5 mg/L out of 10 max)
+                // 226 * (1 - 0.55) = 101.7
+                setTimeout(() => {
+                    if (gaugeGreen) gaugeGreen.style.strokeDashoffset = '101.7';
+                }, 150);
+            } else if (index === 3) {
+                // Animate bar chart heights
+                setTimeout(() => {
+                    if (barBlue) barBlue.style.height = '140px'; // 7.0 representation
+                    if (barGreen) barGreen.style.height = '110px'; // 5.5 representation
+                }, 150);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight' || event.key === 'Space') {
+                nextSlide();
+            } else if (event.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Initialize first slide animations
+        window.addEventListener('DOMContentLoaded', () => {
+            handleSlideAnimations(0);
+        });
+    </script>
+<script>
+document.addEventListener('keydown', (e) => {
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") {
+        window.parent.postMessage('keydown-next', '*');
+    } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        window.parent.postMessage('keydown-prev', '*');
+    }
+});
+</script>
+</body>
+</html>

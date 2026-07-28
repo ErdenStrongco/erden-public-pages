@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>應用場景二：循環水養殖與魚蝦塭</title>
+    <link rel="stylesheet" href="./presentation.css">
+    <style>
+        /* Fade in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-container {
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            background: #f4f7fc !important;
+            border: 2px solid #0f2950 !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+            color: #0f2950 !important;
+            box-sizing: border-box;
+        }
+
+        .slide-header {
+            border-bottom: 1.5px solid #0f2950 !important;
+            margin-bottom: 15px !important;
+            padding-bottom: 10px !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slide-title {
+            background: none !important;
+            -webkit-text-fill-color: #0f2950 !important;
+            color: #0f2950 !important;
+            font-size: 26px !important;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slide-title::before {
+            background: #0f2950 !important;
+            box-shadow: none !important;
+            height: 24px !important;
+            width: 6px !important;
+        }
+
+        .badge-container {
+            display: flex;
+            gap: 8px;
+            margin-left: 16px;
+        }
+
+        .badge {
+            background: #0f2950;
+            color: #ffffff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .slide-subtitle {
+            color: #5b7086 !important;
+            font-weight: 600;
+            font-size: 13px !important;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        /* Slide Body Layout */
+        .slide-body {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: block !important;
+            margin: 0;
+            padding: 0;
+            overflow: visible;
+        }
+
+        .diagram-container {
+            position: absolute;
+            left: -15px;
+            top: 15px;
+            width: 480px;
+            height: 380px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .diagram-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .cards-container {
+            position: absolute;
+            right: 0px;
+            top: 10px;
+            width: 320px;
+            height: 360px;
+            z-index: 10;
+        }
+
+        /* Tech-style Card Item */
+        .card-item {
+            position: absolute;
+            left: 0;
+            width: 320px;
+            background: #ffffff;
+            border: 1.5px solid #0f2950;
+            padding: 14px 18px;
+            box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(15, 41, 80, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .card-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(15, 41, 80, 0.12);
+        }
+
+        /* Corner Tech accents */
+        .card-item::before {
+            content: '';
+            position: absolute;
+            top: -1.5px;
+            left: -1.5px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 8px 8px 0 0;
+            border-color: #0f2950 transparent transparent transparent;
+        }
+
+        .card-item::after {
+            content: '';
+            position: absolute;
+            bottom: -1.5px;
+            right: -1.5px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 0 8px 8px;
+            border-color: transparent transparent #0f2950 transparent;
+        }
+
+        .card-header-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .card-icon {
+            flex-shrink: 0;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f2950;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .card-desc {
+            font-size: 12.5px;
+            color: #475569;
+            line-height: 1.45;
+        }
+
+        /* SVG lines styling */
+        .connection-lines {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Footer styling */
+        .slide-footer {
+            border-top: 1.5px solid #0f2950 !important;
+            color: #5b7086 !important;
+            padding-top: 8px !important;
+            margin-top: 10px !important;
+        }
+
+        .footer-brand {
+            color: #0f2950 !important;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="slide-header">
+            <div class="header-left">
+                <span class="slide-title">應用場景二：循環水養殖與魚蝦塭</span>
+                <div class="badge-container">
+                    <span class="badge">RAS 循環水養殖</span>
+                    <span class="badge">魚塭</span>
+                    <span class="badge">蝦池</span>
+                    <span class="badge">魚電共生</span>
+                </div>
+            </div>
+            <span class="slide-subtitle">Applications</span>
+        </div>
+        
+        <!-- Body -->
+        <div class="slide-body">
+            <!-- Left Image Diagram -->
+            <div class="diagram-container">
+                <img src="./images/components/recirculating-aquaculture-system.png" alt="循環水養塭示意圖">
+            </div>
+            
+            <!-- Right Text Cards -->
+            <div class="cards-container">
+                <!-- Card 1 -->
+                <div class="card-item" style="top: 40px; height: 100px;">
+                    <div class="card-header-wrapper">
+                        <svg class="card-icon" viewBox="0 0 24 24" width="22" height="22" style="fill: none; stroke: #0f2950; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;">
+                            <path d="M21.5 2v6h-6M21.34 8a10 10 0 1 0-.45 5.38"/>
+                            <text x="6" y="15" font-family="'Outfit', sans-serif" font-weight="bold" font-size="8" fill="#0f2950" stroke="none">O₂</text>
+                        </svg>
+                        <h3 class="card-title">全方位提升溶氧</h3>
+                    </div>
+                    <p class="card-desc">確保高密度養殖下的底層與整體溶氧充足。</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="card-item" style="top: 190px; height: 125px;">
+                    <div class="card-header-wrapper">
+                        <svg class="card-icon" viewBox="0 0 24 24" width="22" height="22" style="fill: #0f2950;">
+                            <path d="M12 3a9 9 0 1 0 9 9 9.75 9.75 0 0 1-9-9z"/>
+                            <path d="M19 5l.5 1 .5-1-.5-1-.5 1zm-4-3l.3.6.6-.3-.3-.6-.6.3z"/>
+                        </svg>
+                        <h3 class="card-title">降低夜間風險</h3>
+                    </div>
+                    <p class="card-desc">憑藉長效保氧特性，大幅降低夜間植物/藻類呼吸作用引發的缺氧翻池風險。</p>
+                </div>
+            </div>
+            
+            <!-- SVG Connection Lines -->
+            <svg class="connection-lines">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0f2950" />
+                    </marker>
+                </defs>
+                
+                <!-- Line 1: Microbubble cloud to Card 1 -->
+                <circle cx="378" cy="115" r="4" fill="#0f2950" stroke="#ffffff" stroke-width="1.5" />
+                <path d="M 378 115 L 480 90 L 590 90" fill="none" stroke="#0f2950" stroke-width="1.5" marker-end="url(#arrow)" />
+                
+                <!-- Line 2: Nozzle area to Card 2 -->
+                <circle cx="400" cy="215" r="4" fill="#0f2950" stroke="#ffffff" stroke-width="1.5" />
+                <path d="M 400 215 L 480 252 L 590 252" fill="none" stroke="#0f2950" stroke-width="1.5" marker-end="url(#arrow)" />
+            </svg>
+        </div>
+        
+        <!-- Footer -->
+        <div class="slide-footer">
+            <span class="footer-brand">ERDEN 百昱企業有限公司</span>
+            <span>04 / 16</span>
+        </div>
+    </div>
+<script>
+document.addEventListener('keydown', (e) => {
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") {
+        window.parent.postMessage('keydown-next', '*');
+    } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        window.parent.postMessage('keydown-prev', '*');
+    }
+});
+</script>
+</body>
+</html>

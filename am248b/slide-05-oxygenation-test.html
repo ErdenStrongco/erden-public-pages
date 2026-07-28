@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>極速增氧實測軌跡 - 互動式動態簡報</title>
+    <meta name="description" content="互動式簡報：展示微氣泡技術於水耕農場及養殖漁業之增氧維持效果與實績數據。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark-start: #030a16;
+            --bg-dark-end: #0c1c33;
+            --primary-cyan: #00f0ff;
+            --primary-teal: #64ffda;
+            --primary-green: #10b981;
+            --primary-yellow: #fbbf24;
+            --text-light: #ffffff;
+            --text-muted: #94a3b8;
+            --border-radius-lg: 24px;
+            --border-radius-md: 16px;
+            --border-radius-sm: 8px;
+            --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --transition-speed: 0.4s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark-start) 0%, var(--bg-dark-end) 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Dynamic Bubble Canvas Background */
+        #bubble-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .ambient-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        /* Top Header */
+        header {
+            padding: 16px 30px;
+            background: rgba(3, 10, 22, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .logo-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, var(--primary-cyan) 0%, var(--primary-green) 100%);
+            width: 8px;
+            height: 28px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Nav Menu Controls */
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+        }
+
+        .menu-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .menu-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            border: none;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 198, 255, 0.3);
+        }
+
+        /* Main Workspace */
+        main {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 30px;
+            z-index: 2;
+        }
+
+        @media (max-width: 950px) {
+            main {
+                padding: 16px;
+                overflow-y: auto;
+            }
+        }
+
+        /* Presentation Card Container */
+        .presentation-card {
+            background: rgba(13, 27, 49, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            width: 100%;
+            max-width: 1000px;
+            aspect-ratio: 1000 / 558;
+            padding: 30px 40px;
+            box-shadow: var(--card-shadow), inset 0 0 30px rgba(0, 240, 255, 0.01);
+            border-radius: var(--border-radius-lg);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            backdrop-filter: blur(15px);
+            overflow: hidden;
+        }
+
+        @media (max-width: 950px) {
+            .presentation-card {
+                aspect-ratio: auto;
+                height: auto;
+                gap: 24px;
+                padding: 24px;
+            }
+        }
+
+        /* Slide Body Layout */
+        .slide-content-wrapper {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 768px) {
+            .slide-content-wrapper {
+                flex-direction: column;
+                gap: 24px;
+            }
+        }
+
+        /* Left Side: Water Tank Image Morph Container */
+        .tank-viewer-box {
+            position: relative;
+            width: 320px;
+            height: 330px;
+            flex-shrink: 0;
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .tank-viewer-box {
+                width: 100%;
+                max-width: 280px;
+                height: 280px;
+            }
+        }
+
+        .tank-img-state {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.1s ease;
+        }
+
+        .tank-img-clear {
+            z-index: 1;
+        }
+
+        .tank-img-bubble {
+            z-index: 2;
+            opacity: 0; /* Controlled by JS slider */
+        }
+
+        /* DO Meter crop insert */
+        .do-meter-insert {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            border: 2.5px solid var(--primary-cyan);
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 240, 255, 0.35);
+            z-index: 5;
+            transition: all var(--transition-speed);
+            cursor: pointer;
+        }
+
+        .do-meter-insert:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 20px rgba(0, 240, 255, 0.6);
+        }
+
+        .do-meter-insert img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Right Side: Dashboard Panel */
+        .dashboard-panel {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            gap: 16px;
+        }
+
+        /* Header block with active indicator */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .phase-badge {
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid var(--primary-cyan);
+            color: var(--primary-cyan);
+            padding: 3px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* DO Circle Gauge & Value Container */
+        .telemetry-row {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .gauge-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0;
+        }
+
+        .gauge-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 8;
+        }
+
+        .gauge-fill {
+            fill: none;
+            stroke: var(--primary-yellow);
+            stroke-width: 8;
+            stroke-dasharray: 251.2; /* 2 * pi * 40 */
+            stroke-dashoffset: 251.2;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.1s ease, stroke var(--transition-speed);
+        }
+
+        .gauge-center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-val {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1;
+        }
+
+        .gauge-unit {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .telemetry-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .telemetry-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ffffff;
+            transition: color var(--transition-speed);
+        }
+
+        .telemetry-sub {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Large indicator stats pill */
+        .stats-pill {
+            background-color: #172a45;
+            border: 1.5px solid var(--primary-yellow);
+            border-radius: 6px;
+            padding: 8px 16px;
+            color: #e6f1ff;
+            font-size: 0.9rem;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+            transition: all var(--transition-speed);
+            letter-spacing: 0.5px;
+        }
+
+        /* Specs section dynamic */
+        .specs-container {
+            min-height: 110px;
+        }
+
+        .bullets-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .bullet-item {
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: #cbd5e1;
+            position: relative;
+            padding-left: 18px;
+            opacity: 0;
+            transform: translateY(5px);
+            animation: fadeInItem 0.4s ease forwards;
+        }
+
+        .bullet-item:nth-child(1) { animation-delay: 0.05s; }
+        .bullet-item:nth-child(2) { animation-delay: 0.1s; }
+        .bullet-item:nth-child(3) { animation-delay: 0.15s; }
+        .bullet-item:nth-child(4) { animation-delay: 0.2s; }
+
+        @keyframes fadeInItem {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bullet-item::before {
+            content: '•';
+            color: var(--primary-cyan);
+            position: absolute;
+            left: 2px;
+            font-size: 1rem;
+            top: 0;
+        }
+
+        .bullet-item b {
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        /* Timeline Slider Controls */
+        .timeline-controls-wrapper {
+            margin-top: 16px;
+            border-top: 1.5px solid #172a45;
+            padding-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .time-label {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            width: 50px;
+        }
+
+        .slider-container {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .timeline-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #172a45;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .timeline-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-cyan);
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .timeline-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .timeline-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-cyan);
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .timeline-slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .slider-ticks {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 6px;
+        }
+
+        .tick-label {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .tick-label.active {
+            color: var(--primary-cyan);
+            font-weight: 700;
+        }
+
+        /* Title block */
+        .slide-title {
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary-cyan);
+            padding-left: 12px;
+        }
+
+        /* Modal Overlay for zoomed DO Meter */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(3, 10, 22, 0.85);
+            backdrop-filter: blur(15px);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background: #0d1b31;
+            border: 2px solid var(--primary-cyan);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.25);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-img-wrapper {
+            width: 250px;
+            height: 250px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .modal-close-btn {
+            background: var(--primary-cyan);
+            border: none;
+            color: #030a16;
+            padding: 8px 24px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: #00c6ff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Bubble Canvas -->
+    <canvas id="bubble-canvas"></canvas>
+    <div class="ambient-grid"></div>
+
+    <!-- Top Header -->
+    <header>
+        <div class="logo-title">
+            <div class="logo-badge"></div>
+            <div class="logo-text">微氣泡農場實績展示</div>
+        </div>
+        <div class="nav-menu">
+            <button class="menu-btn" onclick="goToStep(0)">運轉前</button>
+            <button class="menu-btn active" onclick="goToStep(5)">運轉 5 分鐘</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main>
+        <div class="presentation-card">
+            <!-- Slide Title -->
+            <h2 class="slide-title">實測階段一：5分鐘極速增氧</h2>
+
+            <!-- Main Slide Elements -->
+            <div class="slide-content-wrapper">
+                <!-- Left: Tank Morph Image -->
+                <div class="tank-viewer-box">
+                    <img class="tank-img-state tank-img-clear" src="./images/slides/left-tank.jpg" alt="未運轉之一般水體">
+                    <img class="tank-img-state tank-img-bubble" id="tank-bubble-layer" src="./images/slides/page05-left-tank-highres.png" alt="運轉5分鐘呈乳白色白霧狀水體">
+                    
+                    <!-- Floating Crop DO Meter click to zoom -->
+                    <div class="do-meter-insert" onclick="openModal()" title="點擊放大檢視溶氧儀畫面">
+                        <img src="./images/slides/page05-do-meter.jpg" alt="溶氧量儀表">
+                    </div>
+                </div>
+
+                <!-- Right: Information Dashboard -->
+                <div class="dashboard-panel">
+                    <div class="dashboard-header">
+                        <span class="phase-badge" id="phase-text">階段一：極速增氧</span>
+                    </div>
+
+                    <!-- Telemetry Row (SVG Gauge + Values) -->
+                    <div class="telemetry-row">
+                        <!-- SVG Ring Gauge -->
+                        <div class="gauge-wrapper">
+                            <svg class="gauge-svg" viewBox="0 0 100 100">
+                                <circle class="gauge-bg" cx="50" cy="50" r="40"></circle>
+                                <circle class="gauge-fill" id="gauge-ring" cx="50" cy="50" r="40"></circle>
+                            </svg>
+                            <div class="gauge-center-text">
+                                <span class="gauge-val" id="tele-val">7.0</span>
+                                <span class="gauge-unit">mg/L</span>
+                            </div>
+                        </div>
+
+                        <div class="telemetry-details">
+                            <div class="telemetry-title" id="tele-title">開機運轉 5 分鐘後溶氧值</div>
+                            <div class="telemetry-sub" id="tele-sub">實測水溫：28.7°C (增氧效率極高)</div>
+                        </div>
+                    </div>
+
+                    <!-- Badge Stats -->
+                    <div class="stats-pill" id="stats-badge">
+                        溶氧量相較初始值極速提升達 133% / 飽和度達 90.8%
+                    </div>
+
+                    <!-- Bullet Points specs -->
+                    <div class="specs-container" id="bullets-box">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom: Interactive Slider Controls -->
+            <div class="timeline-controls-wrapper">
+                <div class="slider-row">
+                    <span class="time-label">歷時：</span>
+                    <div class="slider-container">
+                        <input type="range" class="timeline-slider" id="timeSlider" min="0" max="5" step="0.1" value="5" oninput="updateTimeline(this.value)">
+                    </div>
+                    <span class="time-label" style="text-align: right;" id="time-display">5.0 min</span>
+                </div>
+                <div class="slider-ticks">
+                    <span class="tick-label" onclick="goToStep(0)" id="tick-0">0m (運轉前)</span>
+                    <span class="tick-label" onclick="goToStep(1)" id="tick-1">1m</span>
+                    <span class="tick-label" onclick="goToStep(2)" id="tick-2">2m</span>
+                    <span class="tick-label" onclick="goToStep(3)" id="tick-3">3m</span>
+                    <span class="tick-label" onclick="goToStep(4)" id="tick-4">4m</span>
+                    <span class="tick-label active" onclick="goToStep(5)" id="tick-5">5m (高峰值)</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Zoom overlay -->
+    <div class="modal-overlay" id="zoomModal" onclick="closeModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-img-wrapper">
+                <img src="./images/slides/page05-do-meter.jpg" alt="溶氧量儀表">
+            </div>
+            <div class="modal-title">實測開機運轉5分鐘：溶氧量飆升至 7.0 mg/L</div>
+            <button class="modal-close-btn" onclick="closeModal()">關閉關卡</button>
+        </div>
+    </div>
+
+    <!-- JavaScript Interactive Logic -->
+    <script>
+        // Data configurations for states
+        const stateData = {
+            baseline: {
+                do: 3.0,
+                sat: 39.0,
+                badge: "溶氧量處於初始缺氧低谷 / 飽和度僅 39.0%",
+                title: "開機前初始溶解氧狀態",
+                sub: "實測水溫：28.7°C (基線狀態)",
+                phase: "基準線：設備未運轉",
+                bullets: [
+                    "<b>實測水溫</b>：28.7°C",
+                    "<b>溶解氧較低</b>：設備運轉前，溶解氧僅有 3.0 mg/L，水體處於低氧狀態。",
+                    "<b>物理現象</b>：水體十分清澈，無微細氣泡，氣液接觸面積小，溶氧增加緩慢。",
+                    "<b>應用背景</b>：在缺氧環境下，作物根系或魚類活動可能受到抑制，急需高效補氧。"
+                ]
+            },
+            peak: {
+                do: 7.0,
+                sat: 90.8,
+                badge: "溶氧量相較初始值極速提升達 133% / 飽和度達 90.8%",
+                title: "開機運轉 5 分鐘後溶氧值",
+                sub: "實測水溫：28.7°C (增氧效率極高)",
+                phase: "階段一：極速增氧",
+                bullets: [
+                    "<b>實測水溫</b>：28.7°C",
+                    "<b>極速增氧</b>：開機運轉僅 5 分鐘，溶解氧從 3.0 mg/L 迅速拉升至 7.0 mg/L。",
+                    "<b>物理現象</b>：整個水體迅速被乳白色微氣泡充滿，氣泡密度極高，建立超大氣液接觸面。",
+                    "<b>應用優勢</b>：適合定時快速補氧，能在極短時間內拉高溶氧打破缺氧僵局，效率勝過傳統打氣。"
+                ]
+            }
+        };
+
+        // Cache DOM elements
+        const timeSlider = document.getElementById('timeSlider');
+        const timeDisplay = document.getElementById('time-display');
+        const tankBubble = document.getElementById('tank-bubble-layer');
+        const gaugeRing = document.getElementById('gauge-ring');
+        const teleVal = document.getElementById('tele-val');
+        const teleTitle = document.getElementById('tele-title');
+        const teleSub = document.getElementById('tele-sub');
+        const statsBadge = document.getElementById('stats-badge');
+        const bulletsBox = document.getElementById('bullets-box');
+        const phaseBadge = document.getElementById('phase-text');
+        const zoomModal = document.getElementById('zoomModal');
+
+        // Initial setup
+        let currentStepData = stateData.peak;
+        let lastStateName = 'peak';
+        let bubbleSpawnRateFactor = 1.0;
+        updateTimeline(5);
+
+        // Update the slider timeline
+        function updateTimeline(val) {
+            val = parseFloat(val);
+            timeSlider.value = val;
+            timeDisplay.textContent = val.toFixed(1) + " min";
+            
+            // 1. Calculate image transparency morph
+            const factor = val / 5; // 0 to 1
+            tankBubble.style.opacity = factor;
+
+            // 2. Interpolate DO and Saturation data
+            const curDO = 3.0 + (7.0 - 3.0) * factor;
+            const curSat = 39.0 + (90.8 - 39.0) * factor;
+            teleVal.textContent = curDO.toFixed(1);
+
+            // 3. Update Gauge Ring
+            // Max value is 8.0 mg/L for visual scaling (100% ring = 8.0)
+            const ringPercent = curDO / 8.0;
+            const ringOffset = 251.2 * (1 - ringPercent);
+            gaugeRing.style.strokeDashoffset = ringOffset;
+
+            // Gauge ring color transitions dynamically
+            if (curDO < 4.5) {
+                gaugeRing.style.stroke = "var(--primary-yellow)";
+            } else if (curDO < 6.0) {
+                gaugeRing.style.stroke = "var(--primary-cyan)";
+            } else {
+                gaugeRing.style.stroke = "var(--primary-teal)";
+            }
+
+            // Update tick active states
+            for (let i = 0; i <= 5; i++) {
+                const tick = document.getElementById(`tick-${i}`);
+                if (Math.round(val) === i) {
+                    tick.classList.add('active');
+                } else {
+                    tick.classList.remove('active');
+                }
+            }
+
+            // 4. Update texts depending on the major state
+            const targetState = val < 2.5 ? 'baseline' : 'peak';
+            
+            // Highlight header button
+            const menuBtns = document.querySelectorAll('.menu-btn');
+            if (targetState === 'baseline') {
+                menuBtns[0].classList.add('active');
+                menuBtns[1].classList.remove('active');
+            } else {
+                menuBtns[0].classList.remove('active');
+                menuBtns[1].classList.add('active');
+            }
+
+            if (targetState !== lastStateName) {
+                lastStateName = targetState;
+                const data = stateData[targetState];
+                
+                teleTitle.textContent = data.title;
+                teleSub.textContent = data.sub;
+                phaseBadge.textContent = data.phase;
+                
+                statsBadge.textContent = data.badge;
+                if (targetState === 'baseline') {
+                    statsBadge.style.borderColor = "var(--primary-yellow)";
+                    statsBadge.style.color = "#ffe082";
+                } else {
+                    statsBadge.style.borderColor = "var(--primary-teal)";
+                    statsBadge.style.color = "#e6f1ff";
+                }
+
+                // Render bullets list
+                let listHtml = '<ul class="bullets-list">';
+                data.bullets.forEach(bullet => {
+                    listHtml += `<li class="bullet-item">${bullet}</li>`;
+                });
+                listHtml += '</ul>';
+                bulletsBox.innerHTML = listHtml;
+            }
+
+            // Adjust bubble generation rate on canvas
+            bubbleSpawnRateFactor = 0.1 + factor * 1.9; // Scale from 10% to 200%
+        }
+
+        // Quick navigation buttons helper
+        function goToStep(min) {
+            // Animate slider to targets
+            let start = parseFloat(timeSlider.value);
+            let end = min;
+            let duration = 200; // ms
+            let startTime = null;
+
+            function anim(timestamp) {
+                if (!startTime) startTime = timestamp;
+                let progress = timestamp - startTime;
+                let t = Math.min(progress / duration, 1);
+                // Ease function
+                let easeVal = start + (end - start) * t;
+                updateTimeline(easeVal);
+                if (t < 1) {
+                    requestAnimationFrame(anim);
+                }
+            }
+            requestAnimationFrame(anim);
+        }
+
+        // Modal Zoom Logic
+        function openModal() {
+            zoomModal.classList.add('active');
+        }
+
+        function closeModal() {
+            zoomModal.classList.remove('active');
+        }
+
+        // Canvas Particle Bubbles system
+        const canvas = document.getElementById('bubble-canvas');
+        const ctx = canvas.getContext('2d');
+        let bubbles = [];
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class ParticleBubble {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 20;
+                this.radius = 0.5 + Math.random() * 2.5; // Micro-bubbles are small
+                this.speedY = 0.4 + Math.random() * 1.2;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.opacity = 0.1 + Math.random() * 0.4;
+            }
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX;
+                // Fade out near the top
+                if (this.y < 100) {
+                    this.opacity -= 0.005;
+                }
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.fill();
+            }
+        }
+
+        function initBubbles() {
+            for (let i = 0; i < 40; i++) {
+                bubbles.push(new ParticleBubble());
+                bubbles[i].y = Math.random() * canvas.height; // Distribute initial
+            }
+        }
+        initBubbles();
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Update & Draw particles
+            bubbles.forEach((p, index) => {
+                p.update();
+                p.draw();
+                if (p.y < 0 || p.opacity <= 0) {
+                    bubbles[index] = new ParticleBubble();
+                }
+            });
+
+            // Adjust count based on rate factor dynamically
+            const targetCount = Math.floor(100 * bubbleSpawnRateFactor);
+            if (bubbles.length < targetCount) {
+                bubbles.push(new ParticleBubble());
+            } else if (bubbles.length > targetCount) {
+                bubbles.pop();
+            }
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+
+<script>
+document.addEventListener('keydown', (e) => {
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") {
+        window.parent.postMessage('keydown-next', '*');
+    } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        window.parent.postMessage('keydown-prev', '*');
+    }
+});
+</script>
+</body>
+</html>
